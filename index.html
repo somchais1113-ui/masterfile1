@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -355,10 +356,20 @@ label,.card-title,.items-header span,.history-table th,.hist-table th{color:var(
         <input type="range" id="c-setup" min="0" max="800" value="200" step="50" oninput="syncNum('c-setup','n-setup');calcPrice()">
         <input type="number" id="n-setup" class="cinput" value="200" min="0" max="5000" step="50" oninput="syncSlider('n-setup','c-setup');calcPrice()">
       </div>
-      <div class="calc-row">
-        <label>ค่าวัสดุ/ชิ้น ถ้าจัดหาให้ (฿)</label>
-        <input type="range" id="c-matcost" min="0" max="500" value="0" step="10" oninput="syncNum('c-matcost','n-matcost');calcPrice()">
-        <input type="number" id="n-matcost" class="cinput" value="0" min="0" max="9999" step="10" oninput="syncSlider('n-matcost','c-matcost');calcPrice()">
+<!-- ต้นทุนสินค้า (กระบอกน้ำ, โล่, ของขวัญ ที่รับมาก่อนสลัก) -->
+      <div style="background:#fff;border:1px solid #93c5fd;border-radius:8px;padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:#0369a1;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">ต้นทุนสินค้า (ถ้าเราจัดหาให้ลูกค้า)</div>
+        <div class="calc-row" style="margin-bottom:8px;">
+          <label>ราคาสินค้า/ชิ้น ที่รับมา (฿) <span style="font-weight:400;color:var(--ink3);">เช่น กระบอกน้ำ, โล่</span></label>
+          <input type="range" id="c-prodcost" min="0" max="1000" value="0" step="10" oninput="syncNum('c-prodcost','n-prodcost');calcPrice()">
+          <input type="number" id="n-prodcost" class="cinput" value="0" min="0" max="99999" step="10" oninput="syncSlider('n-prodcost','c-prodcost');calcPrice()">
+        </div>
+        <div class="calc-row" style="margin-bottom:0;">
+          <label>ค่าวัสดุสิ้นเปลือง/ชิ้น (฿) <span style="font-weight:400;color:var(--ink3);">หมึก, แก๊ส, สายเลเซอร์</span></label>
+          <input type="range" id="c-matcost" min="0" max="500" value="0" step="5" oninput="syncNum('c-matcost','n-matcost');calcPrice()">
+          <input type="number" id="n-matcost" class="cinput" value="0" min="0" max="9999" step="5" oninput="syncSlider('n-matcost','c-matcost');calcPrice()">
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;" id="prodcost-note">ต้นทุนสินค้า ฿0 + ค่าวัสดุ ฿0 = รวม ฿0/ชิ้น</div>
       </div>
       <div class="calc-row">
         <label>Margin ที่ต้องการ (%)</label>
@@ -535,6 +546,7 @@ label,.card-title,.items-header span,.history-table th,.hist-table th{color:var(
   <div class="btn-row action-button-row" style="margin-bottom:30px;">
     <button class="btn btn-outline" onclick="duplicateForm()">Duplicate</button>
     <button class="btn btn-info" onclick="sendToSheets()">ส่งไป Sheets</button>
+    <button class="btn btn-info" onclick="fetchNextNumber()">ขอเลขจาก Sheets</button>
     <button class="btn btn-outline btn-action-preview" onclick="previewPrint()">Preview Print / Test PDF</button>
     <button class="btn btn-primary btn-action-main btn-action-clear" onclick="clearForm()">Clear Form</button>
     <button class="btn btn-gold btn-action-main btn-action-export" onclick="exportPDF()">Export PDF</button>
@@ -927,7 +939,6 @@ label,.card-title,.items-header span,.history-table th,.hist-table th{color:var(
 
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg"></span></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 // ── STATE ──────────────────────────────────────────────
 let quotations = JSON.parse(localStorage.getItem('vflaser_quotes')||'[]');
@@ -1070,22 +1081,29 @@ function setMat(btn, name, mul, speed) {
 
 function calcPrice() {
   const gv = id => parseFloat(document.getElementById(id)?.value)||0;
-  const W       = gv('n-w')||gv('c-w')||3;
-  const H       = gv('n-h')||gv('c-h')||3;
-  const typeMul = parseFloat(document.getElementById('c-type')?.value)||1.0;
-  const rate    = gv('n-rate')||gv('c-rate')||12;
-  const setup   = gv('n-setup') !== undefined ? gv('n-setup') : gv('c-setup');
-  const matCost = gv('n-matcost') !== undefined ? gv('n-matcost') : gv('c-matcost');
-  const margin  = gv('n-margin')||gv('c-margin')||40;
-  const qty     = parseInt(document.getElementById('n-qty')?.value||document.getElementById('c-qty')?.value)||1;
+  const W        = gv('n-w')||gv('c-w')||3;
+  const H        = gv('n-h')||gv('c-h')||3;
+  const typeMul  = parseFloat(document.getElementById('c-type')?.value)||1.0;
+  const rate     = gv('n-rate')||gv('c-rate')||12;
+  const setup    = gv('n-setup') !== undefined ? gv('n-setup') : gv('c-setup');
+  const matCost  = gv('n-matcost') !== undefined ? gv('n-matcost') : gv('c-matcost');
+  const prodCost = gv('n-prodcost') !== undefined ? gv('n-prodcost') : gv('c-prodcost'); // ราคาสินค้าที่รับมา
+  const margin   = gv('n-margin')||gv('c-margin')||40;
+  const qty      = parseInt(document.getElementById('n-qty')?.value||document.getElementById('c-qty')?.value)||1;
 
-  // คำนวณ
-  const area       = W * H;
-  const timePerPc  = (area / calcMatSpeed) * typeMul * calcMatMul;
-  const laserCost  = timePerPc * rate;
-  const baseCostPc = laserCost + matCost;
+  // ── คำนวณต้นทุนเลเซอร์ ──
+  const area       = W * H;                                         // cm² ของ artwork
+  const timePerPc  = (area / calcMatSpeed) * typeMul * calcMatMul;  // นาที/ชิ้น
+  const laserCost  = timePerPc * rate;                              // ฿ค่าเครื่อง/ชิ้น
 
-  const tier = BULK_TIERS.find(t=>qty>=t.min&&qty<=t.max)||BULK_TIERS[BULK_TIERS.length-1];
+  // ── ต้นทุนรวม/ชิ้น = เลเซอร์ + วัสดุสิ้นเปลือง + ราคาสินค้าที่รับมา ──
+  const baseCostPc = laserCost + matCost + prodCost;
+
+  // ── อัปเดต prodcost note ──
+  const pn = document.getElementById('prodcost-note');
+  if(pn) pn.textContent = `ต้นทุนสินค้า ฿${Math.round(prodCost).toLocaleString()} + ค่าวัสดุ ฿${Math.round(matCost).toLocaleString()} = รวม ฿${Math.round(prodCost+matCost).toLocaleString()}/ชิ้น`;
+
+  const tier       = BULK_TIERS.find(t=>qty>=t.min&&qty<=t.max)||BULK_TIERS[BULK_TIERS.length-1];
   const setupPc    = setup / Math.max(qty,1);
   const totalCostPc= baseCostPc + setupPc;
   const priceBase  = totalCostPc / (1 - margin/100);
@@ -1095,13 +1113,13 @@ function calcPrice() {
 
   const fmtT = m => m<1 ? Math.round(m*60)+'วิ' : m<60 ? m.toFixed(1)+'น.' : (m/60).toFixed(1)+'ชม.';
   const fmtB = v => '฿'+Math.round(v).toLocaleString();
-  const sv=(id,txt)=>{const e=document.getElementById(id);if(e)e.textContent=txt;};
+  const sv   = (id,txt)=>{const e=document.getElementById(id);if(e)e.textContent=txt;};
   sv('r-area',  area.toFixed(1)+' cm²');
   sv('r-time',  fmtT(timePerPc));
   sv('r-price', fmtB(priceAfter));
   sv('r-total', fmtB(totalJob));
 
-  // Bulk Tier Table
+  // ── Bulk Tier Table ──
   let tbHtml='';
   BULK_TIERS.forEach(t=>{
     const midQty   = t.max===Infinity ? t.min : Math.round((t.min+Math.min(t.max,300))/2);
@@ -1125,17 +1143,20 @@ function calcPrice() {
   const tb=document.getElementById('tier-body');
   if(tb) tb.innerHTML=tbHtml;
 
-  // Logic explanation
-  const typeEl=document.getElementById('c-type');
-  const typeTxt=typeEl?typeEl.options[typeEl.selectedIndex].text.split('—')[0].trim():'';
-  const logicEl=document.getElementById('calc-logic');
-  if(logicEl) logicEl.innerHTML=
-    `<strong>วิธีคิด:</strong> Artwork ${W}×${H} cm = <strong>${area.toFixed(1)} cm²</strong> · `+
-    `เครื่องบน ${calcMatName} (${calcMatSpeed} cm²/น.) × [${typeTxt}] ×${typeMul} × mat×${calcMatMul} `+
-    `= <strong>${fmtT(timePerPc)}/ชิ้น</strong><br>`+
-    `ต้นทุน: ค่าเครื่อง ${fmtB(laserCost)} + setup กระจาย ${fmtB(setupPc)} + วัสดุ ${fmtB(matCost)} `+
-    `= <strong>${fmtB(totalCostPc)}/ชิ้น</strong> → หาร (1−${margin}%) → ก่อน discount <strong>${fmtB(priceBase)}</strong> `+
-    `→ Tier "${tier.label}" (−${Math.round(tier.disc*100)}%) → <strong>${fmtB(priceAfter)}/ชิ้น · Margin จริง ${Math.round(realMargin)}%</strong>`;
+  // ── Logic explanation (breakdown ชัดเจน) ──
+  const typeEl  = document.getElementById('c-type');
+  const typeTxt = typeEl ? typeEl.options[typeEl.selectedIndex].text.split('—')[0].trim() : '';
+  const logicEl = document.getElementById('calc-logic');
+  if(logicEl){
+    const prodLine = prodCost>0 ? ` + สินค้า ${fmtB(prodCost)}` : '';
+    logicEl.innerHTML =
+      `<strong>วิธีคิด:</strong> Artwork ${W}×${H} cm = <strong>${area.toFixed(1)} cm²</strong> · `+
+      `เครื่องบน ${calcMatName} (${calcMatSpeed} cm²/น.) × [${typeTxt}] ×${typeMul} × mat×${calcMatMul} = <strong>${fmtT(timePerPc)}/ชิ้น</strong><br>`+
+      `ต้นทุน: ค่าเครื่อง ${fmtB(laserCost)} + setup ${fmtB(setupPc)} + วัสดุ ${fmtB(matCost)}${prodLine} `+
+      `= <strong>${fmtB(totalCostPc)}/ชิ้น</strong> → หาร (1−${margin}%) → ${fmtB(priceBase)} `+
+      `→ Tier "${tier.label}" −${Math.round(tier.disc*100)}% → `+
+      `<strong>${fmtB(priceAfter)}/ชิ้น · Margin จริง ${Math.round(realMargin)}%</strong>`;
+  }
 }
 
 function addFromCalc() {
@@ -1147,7 +1168,9 @@ function addFromCalc() {
   const typeTxt = typeEl ? typeEl.options[typeEl.selectedIndex].text.split('—')[0].trim() : '';
   const W = parseFloat(document.getElementById('n-w')?.value||document.getElementById('c-w')?.value)||0;
   const H = parseFloat(document.getElementById('n-h')?.value||document.getElementById('c-h')?.value)||0;
-  const name = `Laser Engrave ${calcMatName} ${W}×${H}cm [${typeTxt}]`;
+  const prodCost = parseFloat(document.getElementById('n-prodcost')?.value||0);
+  let name = `Laser Engrave ${calcMatName} ${W}×${H}cm [${typeTxt}]`;
+  if(prodCost>0) name += ` (รวมสินค้า ฿${Math.round(prodCost).toLocaleString()})`;
   addItem(name, qty, price);
   showToast('เพิ่มราคาจาก Calculator แล้ว');
 }
@@ -1219,9 +1242,26 @@ function fmt(d){return d.toISOString().split('T')[0];}
 
 function genQTNum(){
   const p = settings.prefix||'QT-2026-';
-  const n = String(qtCounter+1).padStart(3,'0');
+  const n = String(qtCounter+1).padStart(4,'0');
   document.getElementById('qt-number-display').textContent = p+n;
   return p+n;
+}
+
+// ขอเลขกลางจาก Google Sheets (ทีมหลายเครื่อง เลขไม่ซ้ำกัน)
+async function fetchNextNumber(){
+  const url=localStorage.getItem('vflaser_scripturl');
+  if(!url){genQTNum();showToast('ยังไม่มี Sheets URL — ใช้เลข local');return;}
+  const disp=document.getElementById('qt-number-display');
+  const prev=disp.textContent;
+  disp.textContent='กำลังขอเลข...';
+  try{
+    const res=await fetch(url);
+    const j=await res.json();
+    if(j.number){disp.textContent=j.number;showToast('ได้เลขจาก Sheets: '+j.number);return j.number;}
+  }catch(e){}
+  disp.textContent=prev;
+  showToast('เชื่อม Sheets ไม่ได้ — ใช้เลข local');
+  genQTNum();
 }
 
 function showPage(p, btn) {
@@ -1532,9 +1572,7 @@ async function generatePdf(mode='save') {
   if(actionBusy) return;
   const data=getFormData();
   const errors=validateQuotationData(data);
-  if(errors.length){showToast('ยังสร้าง PDF ไม่ได้
-• '+errors.slice(0,5).join('
-• '), 5200);return;}
+  if(errors.length){showToast('ยังสร้าง PDF ไม่ได้\n• '+errors.slice(0,5).join('\n• '), 5200);return;}
   if(typeof window.jspdf==='undefined'){showToast('⏳ โหลด PDF engine...');setTimeout(()=>generatePdf(mode),800);return;}
   setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังสร้าง Preview...' : 'กำลัง Export...');
   try {
@@ -2318,8 +2356,7 @@ function importBackupJSON(input){
       const raw=JSON.parse(reader.result);
       const incomingQuotes=Array.isArray(raw.quotations) ? raw.quotations : (Array.isArray(raw.quotes) ? raw.quotes : null);
       if(!incomingQuotes) throw new Error('invalid-json');
-      if(!confirm('Import backup นี้จะเขียนทับข้อมูลใบเสนอราคา การตั้งค่า และ Catalog เดิม
-ยืนยันหรือไม่?')){ input.value=''; return; }
+      if(!confirm('Import backup นี้จะเขียนทับข้อมูลใบเสนอราคา การตั้งค่า และ Catalog เดิม\nยืนยันหรือไม่?')){ input.value=''; return; }
       quotations=incomingQuotes;
       settings=raw.settings||{};
       catalog=Array.isArray(raw.catalog)?raw.catalog:[];
@@ -2385,7 +2422,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   loadSettings();
   genQTNum();
   // sync number inputs กับ slider default
-  ['c-w','c-h','c-rate','c-setup','c-matcost','c-margin','c-qty'].forEach(sid=>{
+  ['c-w','c-h','c-rate','c-setup','c-matcost','c-prodcost','c-margin','c-qty'].forEach(sid=>{
     const nid=sid.replace('c-','n-');
     syncNum(sid,nid);
   });
