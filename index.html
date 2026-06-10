@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -2975,7 +2976,7 @@ async function generatePdf(mode='save') {
   try {
     const {jsPDF}=window.jspdf;
     const doc=new jsPDF({unit:'mm',format:'a4'});
-    let pdfFontFamily = pdfFontFamily;
+    let pdfFontFamily = PDF_FONT_CFG.family;
     try {
       await registerPdfFonts(doc);
     } catch(e) {
