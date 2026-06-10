@@ -7,33 +7,47 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+@font-face{
+  font-family:'THSarabun';
+  src:url('./THSarabun.ttf') format('truetype');
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:'THSarabun';
+  src:url('./THSarabun%20Bold.ttf') format('truetype');
+  font-weight:700;
+  font-style:normal;
+  font-display:swap;
+}
 :root{
-  --ink:#141413;--ink2:#3d3d3b;--ink3:#6e6e68;
-  --line:#e8e6dc;--bg:#faf9f5;--white:#ffffff;
-  --accent:#d97757;--accent-h:#c4643e;--accent2:#6a9bcc;--accent-light:#fdf5f2;
-  --laser:#d97757;--laser-light:#fdf5f2;--laser-mid:#f0c4b0;
-  --green:#788c5d;--green-light:#f2f5ed;
-  --danger:#c0392b;--info:#6a9bcc;--warning:#b8860b;
-  --mid:#b0aea5;--light-gray:#e8e6dc;
-  --r:10px;--font:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif;
-  --shadow:0 1px 2px rgba(20,20,19,.06);
-  --shadow-md:0 3px 8px rgba(20,20,19,.08);
-  --shadow-lg:0 8px 24px rgba(20,20,19,.1);
+  /* High-contrast blue theme — safer for screen reading and printing */
+  --ink:#0f172a;--ink2:#1e293b;--ink3:#475569;
+  --line:#cbd5e1;--bg:#f8fafc;--white:#ffffff;
+  --accent:#1d4ed8;--accent-h:#1e40af;--accent2:#0284c7;--accent-light:#dbeafe;
+  --laser:#1d4ed8;--laser-light:#dbeafe;--laser-mid:#93c5fd;
+  --green:#166534;--green-light:#dbeafe;
+  --danger:#b91c1c;--info:#0369a1;--warning:#92400e;
+  --mid:#64748b;--light-gray:#e2e8f0;
+  --r:10px;--font:'THSarabun','Poppins','Segoe UI',system-ui,-apple-system,sans-serif;
+  --shadow:0 1px 2px rgba(15,23,42,.10);
+  --shadow-md:0 4px 12px rgba(15,23,42,.14);
+  --shadow-lg:0 10px 28px rgba(15,23,42,.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased;}
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 /* NAV */
-.nav{background:#141413;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
+.nav{background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
 .nav-brand{display:flex;align-items:center;gap:12px;}
-.nav-logo{width:36px;height:36px;background:var(--accent2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#111827;}
-.nav-title{font-size:14px;font-weight:600;color:#faf9f5;letter-spacing:.3px;}
-.nav-sub{font-size:11px;color:#b0aea5;margin-top:1px;}
+.nav-logo{width:36px;height:36px;background:var(--accent2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0f172a;}
+.nav-title{font-size:14px;font-weight:600;color:#f8fafc;letter-spacing:.3px;}
+.nav-sub{font-size:11px;color:#64748b;margin-top:1px;}
 .nav-tabs{display:flex;gap:4px;}
-.nav-tab{padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:#9ca3af;border:none;background:none;transition:all .2s;}
-.nav-tab.active{background:rgba(217,119,87,.18);color:#f5c4b0;font-weight:600;border-bottom:2px solid var(--accent);}
-.nav-tab:hover:not(.active){background:rgba(255,255,255,.06);color:#e5e7eb;}
+.nav-tab{padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:#94a3b8;border:none;background:none;transition:all .2s;}
+.nav-tab.active{background:rgba(29,78,216,.22);color:#93c5fd;font-weight:600;border-bottom:2px solid var(--accent);}
+.nav-tab:hover:not(.active){background:rgba(255,255,255,.06);color:#e2e8f0;}
 
 /* PAGES */
 .page{display:none;padding:24px;max-width:1100px;margin:0 auto;animation:fadeIn .2s ease;}
@@ -53,8 +67,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14p
 .form-group{display:flex;flex-direction:column;gap:6px;}
 .form-group.full{grid-column:1/-1;}
 label{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.03em;}
-input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;font-family:var(--font);color:var(--ink);background:#f9fafb;transition:all .15s;outline:none;width:100%;}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(217,119,87,.15);}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;font-family:var(--font);color:var(--ink);background:#ffffff;transition:all .15s;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(29,78,216,.16);}
 textarea{resize:vertical;min-height:64px;}
 .input-unit{position:relative;}
 .input-unit input{padding-right:36px;}
@@ -80,25 +94,26 @@ textarea{resize:vertical;min-height:64px;}
 .calc-row input[type=range]{flex:1;accent-color:var(--laser);}
 .calc-row .cval{font-size:12px;font-weight:700;color:var(--ink);min-width:72px;text-align:right;}
 .calc-row input[type=number].cinput{width:78px;flex-shrink:0;padding:6px 10px;font-size:13px;font-weight:700;text-align:right;border:1px solid var(--laser-mid);background:var(--white);border-radius:6px;color:var(--laser);}
-.calc-row input[type=number].cinput:focus{border-color:var(--laser);outline:none;box-shadow:0 0 0 3px rgba(220,38,38,.1);}
+.calc-row input[type=number].cinput:focus{border-color:var(--laser);outline:none;box-shadow:0 0 0 3px rgba(29,78,216,.14);}
 .tier-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;}
 .tier-table th{background:var(--light-gray);font-size:11px;font-weight:700;color:var(--ink2);padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.04em;}
 .tier-table td{padding:10px 14px;border-bottom:1px solid var(--line);color:var(--ink2);}
-.tier-table tr.tier-active td{background:var(--accent-light);color:var(--accent-h,#c4643e);font-weight:600;}
+.tier-table tr.tier-active td{background:var(--accent-light);color:var(--accent-h,#1e40af);font-weight:600;}
 .tier-table td.danger{color:var(--danger);}
 .tier-table td.warn{color:var(--warning);}
 .tier-table td.good{color:var(--accent);}
-.calc-logic{background:#f3f4f6;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ink3);line-height:1.7;margin-top:12px;}
+.calc-logic{background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ink3);line-height:1.7;margin-top:12px;}
 .calc-logic strong{color:var(--ink2);}
-.items-header{display:grid;grid-template-columns:2.5fr 65px 95px 95px 36px;gap:8px;padding:10px 14px;background:var(--light-gray);border-radius:6px;margin-bottom:8px;}
+.items-header{display:grid;grid-template-columns:46px 2.5fr 65px 95px 95px 36px;gap:8px;padding:10px 14px;background:var(--light-gray);border-radius:6px;margin-bottom:8px;}
 .items-header span{font-size:11px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;}
-.item-row{display:grid;grid-template-columns:2.5fr 65px 95px 95px 36px;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);}
+.item-row{display:grid;grid-template-columns:46px 2.5fr 65px 95px 95px 36px;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);}
 .item-row input{padding:7px 10px;font-size:13px;}
+.item-no{width:30px;height:30px;border-radius:8px;background:var(--accent-light);border:1px solid var(--laser-mid);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
 .item-subtotal{font-size:13px;font-weight:700;color:var(--ink);padding:7px 10px;background:var(--accent-light);border-radius:6px;text-align:right;}
 .btn-remove{width:30px;height:30px;border-radius:6px;border:1px solid var(--laser-mid);background:var(--laser-light);color:var(--danger);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
-.btn-remove:hover{background:#fecaca;}
+.btn-remove:hover{background:#fee2e2;}
 .btn-add-item{margin-top:10px;padding:9px 14px;border-radius:8px;border:1px dashed var(--accent);background:var(--accent-light);color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;width:100%;}
-.btn-add-item:hover{background:#dcfce7;}
+.btn-add-item:hover{background:#dbeafe;}
 .totals-box{margin-top:20px;border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
 .total-row{display:flex;gap:24px;align-items:center;font-size:14px;}
 .total-row span:first-child{color:var(--ink3);min-width:140px;text-align:right;}
@@ -113,37 +128,76 @@ textarea{resize:vertical;min-height:64px;}
 .profit-item.danger .p-val{color:var(--danger);}
 .btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;font-family:var(--font);display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:var(--shadow);}
 .btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:var(--accent-h,#0c4228);}
-.btn-gold{background:var(--accent2);color:#111827;}.btn-gold:hover{background:#c4a030;}
+.btn-gold{background:var(--accent2);color:#0f172a;}.btn-gold:hover{background:#0369a1;}
 .btn-laser{background:var(--laser);color:#fff;}.btn-laser:hover{background:#b91c1c;}
-.btn-outline{background:var(--white);color:var(--ink2);border:1px solid var(--line);}.btn-outline:hover{background:#f9fafb;border-color:var(--ink3);}
-.btn-danger{background:var(--laser-light);color:var(--danger);border:1px solid var(--laser-mid);}.btn-danger:hover{background:#fecaca;}
-.btn-info{background:#dbeafe;color:var(--info);border:1px solid #bfdbfe;}
+.btn-outline{background:var(--white);color:var(--ink2);border:1px solid var(--line);}.btn-outline:hover{background:#ffffff;border-color:var(--ink3);}
+.btn-danger{background:var(--laser-light);color:var(--danger);border:1px solid var(--laser-mid);}.btn-danger:hover{background:#fee2e2;}
+.btn-info{background:#dbeafe;color:var(--info);border:1px solid #93c5fd;}
 .btn-sm{padding:6px 12px;font-size:12px;}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
-.qt-header{background:linear-gradient(135deg,#141413,#1f2937);border-radius:var(--r);padding:24px;margin-bottom:20px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;box-shadow:var(--shadow-md);}
-.qt-brand-name{font-size:20px;font-weight:700;letter-spacing:1px;color:var(--accent2);}
-.qt-brand-sub{font-size:11px;color:#9ca3af;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;}
+.action-button-row{justify-content:flex-end;align-items:center;width:100%;}
+.btn-action-main{padding:14px 28px;min-height:48px;min-width:132px;border-radius:10px;font-size:16px;font-weight:700;letter-spacing:.01em;box-shadow:var(--shadow-md);}
+.btn-action-main:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg);}
+.btn-action-export{min-width:150px;background:var(--accent);color:#fff;border:none;}
+.btn-action-export:hover{background:var(--accent-h);}
+.btn-action-clear{min-width:138px;background:var(--accent);color:#fff;border:none;}
+.btn-action-clear:hover{background:var(--accent-h);}
+.btn-action-save{min-width:132px;background:var(--accent);color:#fff;}
+.btn-action-preview{border-color:#93c5fd;color:#1e40af;background:#eff6ff;}
+.btn-action-preview:hover{background:#dbeafe;border-color:#60a5fa;}
+.btn.is-busy,.btn:disabled{opacity:.7;cursor:not-allowed;pointer-events:none;filter:saturate(.8);}
+@media(max-width:680px){.action-button-row{justify-content:stretch}.action-button-row .btn{flex:1}.btn-action-main{min-width:0}}
+
+/* Contrast bump for print and low-ink output */
+.card,.metric,.tpl-card{border-color:var(--line);}
+input,select,textarea{border-color:#94a3b8;color:var(--ink);}
+label,.card-title,.items-header span,.history-table th,.hist-table th{color:var(--ink2);}
+.items-header,.tier-table th,.history-table th,.hist-table th{background:#e2e8f0;}
+.item-subtotal,.item-no,.profit-bar,.laser-calc-box,.qr-preview-box{background:#eff6ff;}
+@media print{
+  body{background:#fff;color:#000;}
+  .card,.qt-header,.laser-calc-box,.items-header,.item-row{box-shadow:none;}
+  .card{border-color:#64748b;}
+  input,select,textarea{border-color:#64748b;background:#fff;color:#000;}
+}
+
+/* Quotation header: white primary text for print-safe contrast */
+.qt-header{background:linear-gradient(135deg,#0f172a,#0f172a);border-radius:var(--r);padding:24px;margin-bottom:20px;color:#fff;display:flex;justify-content:space-between;align-items:flex-start;box-shadow:var(--shadow-md);}
+.qt-brand-name{font-size:20px;font-weight:700;letter-spacing:1px;color:#ffffff;}
+.qt-brand-sub{font-size:11px;color:#94a3b8;margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;}
 .qt-brand-contact{font-size:11px;color:#d1d5db;margin-top:8px;line-height:1.8;}
-.qt-num-label{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;text-align:right;}
-.qt-num-val{font-size:22px;font-weight:700;color:var(--accent2);margin-top:4px;text-align:right;}
-.qt-date-disp{font-size:12px;color:#9ca3af;margin-top:4px;text-align:right;}
+.qt-num-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;text-align:right;}
+.qt-num-val{font-size:22px;font-weight:700;color:#ffffff;margin-top:4px;text-align:right;}
+.qt-date-disp{font-size:12px;color:#94a3b8;margin-top:4px;text-align:right;}
 .tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
-.tpl-card{border:2px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;text-align:center;box-shadow:var(--shadow);}
-.tpl-card:hover,.tpl-card.selected{border-color:var(--accent);background:var(--accent-light);box-shadow:var(--shadow-md);}
+.tpl-card{border:2px solid var(--line);border-radius:12px;padding:16px 14px;cursor:pointer;transition:all .2s;text-align:center;box-shadow:var(--shadow);background:#fff;}
+.tpl-card:hover,.tpl-card.selected{border-color:var(--accent);background:var(--accent-light);box-shadow:var(--shadow-md);transform:translateY(-1px);}
 .tpl-card.laser-tpl.selected,.tpl-card.laser-tpl:hover{border-color:var(--laser);background:var(--laser-light);}
+.tpl-card .t-dot{width:10px !important;height:10px !important;margin:0 auto 10px !important;box-shadow:0 0 0 3px rgba(37,99,235,.10);}
 .tpl-card .t-icon{font-size:22px;margin-bottom:6px;}
-.tpl-card .t-name{font-size:12px;font-weight:700;color:var(--ink2);}
-.tpl-card .t-desc{font-size:11px;color:var(--ink3);margin-top:3px;}
+.tpl-card .t-name{font-size:18px;font-weight:800;color:#0f172a;line-height:1.2;letter-spacing:.01em;}
+.tpl-card .t-desc{font-size:13px;font-weight:700;color:#334155;line-height:1.4;margin-top:6px;}
+.tpl-card:hover .t-name,.tpl-card.selected .t-name,.tpl-card:hover .t-desc,.tpl-card.selected .t-desc{color:#0f172a;}
+@media(max-width:768px){
+  .items-header{display:none;}
+  .item-row{grid-template-columns:44px 1fr 34px;grid-template-areas:'no name remove' 'qty price subtotal';gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;}
+  .item-row .item-no{grid-area:no;}
+  .item-row .item-name-input{grid-area:name;min-width:0;}
+  .item-row .item-qty-input{grid-area:qty;min-width:0;}
+  .item-row .item-price-input{grid-area:price;min-width:0;}
+  .item-row .item-subtotal{grid-area:subtotal;min-height:38px;display:flex;align-items:center;justify-content:flex-end;}
+  .item-row .btn-remove{grid-area:remove;}
+}
 .history-search{flex:1;min-width:160px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:var(--white);outline:none;transition:all .15s;}
-.history-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,81,50,.1);}
+.history-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,78,216,.16);}
 .history-table,.hist-table{width:100%;border-collapse:collapse;}
 .history-table th,.hist-table th{font-size:11px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;padding:11px 14px;text-align:left;border-bottom:2px solid var(--line);background:var(--light-gray);}
 .history-table td,.hist-table td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle;}
-.history-table tr:hover td,.hist-table tr:hover td{background:#f9fafb;}
+.history-table tr:hover td,.hist-table tr:hover td{background:#ffffff;}
 .s-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;}
-.s-draft{background:#f0ede6;color:#6e6e68;}.s-sent{background:#e8f0f8;color:#3d6a9a;}
-.s-approved{background:#eef2e8;color:#4a5e35;}.s-rejected{background:#fdf0ed;color:#a0402a;}
-.s-in_production{background:#fdf5e8;color:#8a5a1a;}.s-delivered{background:#f0ede6;color:#3d3d3b;}
+.s-draft{background:#e2e8f0;color:#475569;}.s-sent{background:#dbeafe;color:#1e40af;}
+.s-approved{background:#eef2e8;color:#4a5e35;}.s-rejected{background:#fee2e2;color:#991b1b;}
+.s-in_production{background:#fef3c7;color:#92400e;}.s-delivered{background:#e2e8f0;color:#1e293b;}
 .empty-state{text-align:center;padding:44px;color:var(--ink3);}
 .empty-state-wrap{text-align:center;padding:64px 24px 56px;}
 .empty-icon-box{width:72px;height:72px;border-radius:18px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid var(--laser-mid);}
@@ -154,7 +208,7 @@ textarea{resize:vertical;min-height:64px;}
 .metric-lbl{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
 .pipeline-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
 .pipeline-bar-wrap{margin-top:10px;}
-.pipeline-bar-track{background:#f3f4f6;border-radius:20px;height:10px;overflow:hidden;margin-bottom:4px;}
+.pipeline-bar-track{background:#f1f5f9;border-radius:20px;height:10px;overflow:hidden;margin-bottom:4px;}
 .pipeline-bar-fill{height:10px;border-radius:20px;background:var(--mid);transition:width .5s ease;}
 .pipeline-bar-fill.gold{background:var(--accent2);}
 .pipeline-bar-fill.laser-bar{background:var(--laser);}
@@ -163,13 +217,16 @@ textarea{resize:vertical;min-height:64px;}
 .modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.6);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;}
 .modal-overlay.show{display:flex;}
 .modal-box{background:var(--white);border-radius:var(--r);max-width:420px;width:90%;padding:28px;box-shadow:var(--shadow-lg);animation:fadeIn .2s ease;}
-.toast{position:fixed;bottom:24px;right:24px;background:#141413;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;max-width:380px;}
+.toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;max-width:380px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+#toast-msg{white-space:pre-line;}
+.field-error{border-color:#dc2626 !important;box-shadow:0 0 0 3px rgba(220,38,38,.12) !important;background:#fff !important;}
+.box-error{border:1px solid #dc2626 !important;border-radius:10px;padding:8px;background:#fff7f7;}
 .catalog-tag{display:inline-block;padding:4px 12px;border:1px solid var(--line);border-radius:20px;font-size:12px;cursor:pointer;margin:3px;transition:all .15s;background:var(--white);font-weight:500;}
 .catalog-tag:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
-.script-box{background:#1f2937;border-radius:8px;padding:16px;font-family:'Courier New',monospace;font-size:12px;color:#34d399;line-height:1.7;overflow-x:auto;max-height:300px;overflow-y:auto;}
-.script-box .sc-kw{color:#fbbf24;}.script-box .sc-fn{color:#34d399;}.script-box .sc-str{color:#e8c87a;}.script-box .sc-comment{color:#4b5563;}
+.script-box{background:#0f172a;border-radius:8px;padding:16px;font-family:'Courier New',monospace;font-size:12px;color:#38bdf8;line-height:1.7;overflow-x:auto;max-height:300px;overflow-y:auto;}
+.script-box .sc-kw{color:#fde68a;}.script-box .sc-fn{color:#38bdf8;}.script-box .sc-str{color:#bfdbfe;}.script-box .sc-comment{color:#475569;}
 .apps-step{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);}
 .apps-step:last-child{border-bottom:none;}
 .apps-step-num{width:28px;height:28px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
@@ -411,7 +468,7 @@ textarea{resize:vertical;min-height:64px;}
         </select>
       </div>
     </div>
-    <div id="rush-note" style="display:none;background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:9px 12px;margin-top:10px;font-size:12px;color:#7a5c00;">
+    <div id="rush-note" style="display:none;background:#fef3c7;border:1px solid #f59e0b;border-radius:7px;padding:9px 12px;margin-top:10px;font-size:12px;color:#78350f;">
       <strong>Rush Fee</strong> — งานด่วนจะมีค่าบริการเพิ่มอัตโนมัติในรายการด้านล่าง เพราะต้องหยุดคิวอื่น
     </div>
   </div>
@@ -421,7 +478,7 @@ textarea{resize:vertical;min-height:64px;}
     <div class="card-title">รายการสินค้า / บริการ</div>
     <div id="catalog-tags-bar" style="margin-bottom:9px;"></div>
     <div class="items-header">
-      <span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span>รวม (฿)</span><span></span>
+      <span>No.</span><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span>รวม (฿)</span><span></span>
     </div>
     <div id="items-container"></div>
     <button class="btn-add-item" onclick="addItem()">เพิ่มรายการ</button>
@@ -436,9 +493,9 @@ textarea{resize:vertical;min-height:64px;}
       <label class="toggle-row"><input type="checkbox" id="vat-toggle" checked onchange="recalc()"> รวม VAT 7%</label>
     </div>
     <!-- QR PromptPay Preview -->
-    <div id="qr-preview-box" style="display:none;margin-top:12px;display:none;align-items:flex-start;gap:14px;background:#f0faf5;border:1px solid #c3e6d4;border-radius:8px;padding:12px 14px;">
+    <div id="qr-preview-box" style="display:none;margin-top:12px;display:none;align-items:flex-start;gap:14px;background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:12px 14px;">
       <div style="text-align:center;flex-shrink:0;">
-        <img id="qr-preview-img" src="" width="90" height="90" style="border-radius:6px;border:1px solid #c3e6d4;" alt="PromptPay QR">
+        <img id="qr-preview-img" src="" width="90" height="90" style="border-radius:6px;border:1px solid #93c5fd;" alt="PromptPay QR">
         <div style="font-size:10px;color:var(--ink3);margin-top:4px;">PromptPay</div>
         <div style="font-size:13px;font-weight:700;color:var(--accent);" id="qr-preview-lbl">—</div>
       </div>
@@ -475,12 +532,13 @@ textarea{resize:vertical;min-height:64px;}
     </div>
   </div>
 
-  <div class="btn-row" style="margin-bottom:30px;">
-    <button class="btn btn-primary" onclick="saveQuotation()">บันทึก</button>
-    <button class="btn btn-gold" onclick="exportPDF()">Export PDF</button>
+  <div class="btn-row action-button-row" style="margin-bottom:30px;">
     <button class="btn btn-outline" onclick="duplicateForm()">Duplicate</button>
     <button class="btn btn-info" onclick="sendToSheets()">ส่งไป Sheets</button>
-    <button class="btn btn-outline" onclick="clearForm()">ล้างฟอร์ม</button>
+    <button class="btn btn-outline btn-action-preview" onclick="previewPrint()">Preview Print / Test PDF</button>
+    <button class="btn btn-primary btn-action-main btn-action-clear" onclick="clearForm()">Clear Form</button>
+    <button class="btn btn-gold btn-action-main btn-action-export" onclick="exportPDF()">Export PDF</button>
+    <button class="btn btn-primary btn-action-main btn-action-save" onclick="saveQuotation()">บันทึก</button>
   </div>
 </div>
 
@@ -823,6 +881,38 @@ textarea{resize:vertical;min-height:64px;}
     </div>
   </div>
   <div class="card">
+    <div class="card-title">PDF Font Export</div>
+    <p style="font-size:12px;color:var(--ink3);line-height:1.7;margin-bottom:12px;">
+      ใช้ฟอนต์ THSarabun สำหรับ Export PDF ภาษาไทย/อังกฤษ ถ้าเปิดไฟล์ผ่าน browser แล้วระบบหาไฟล์ฟอนต์ไม่เจอ ให้อัปโหลดฟอนต์ 2 ไฟล์นี้ครั้งเดียว ระบบจะจำไว้ในเครื่องนี้
+    </p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>THSarabun Regular (.ttf)</label>
+        <input type="file" id="pdf-font-regular" accept=".ttf,font/ttf,application/x-font-ttf" onchange="storePdfFontFromInput(this,'regular')">
+      </div>
+      <div class="form-group">
+        <label>THSarabun Bold (.ttf)</label>
+        <input type="file" id="pdf-font-bold" accept=".ttf,font/ttf,application/x-font-ttf" onchange="storePdfFontFromInput(this,'bold')">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap;">
+      <span id="pdf-font-status" style="font-size:12px;color:var(--ink3);">กำลังตรวจสอบฟอนต์...</span>
+      <button class="btn btn-outline btn-sm" onclick="clearStoredPdfFonts()">ล้างฟอนต์ที่จำไว้</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Backup Data</div>
+    <p style="font-size:12px;color:var(--ink3);line-height:1.7;margin-bottom:12px;">
+      สำรองข้อมูลใบเสนอราคา การตั้งค่า และ Catalog เป็นไฟล์ JSON และสามารถนำกลับเข้าระบบได้เมื่อต้องการ
+    </p>
+    <div class="btn-row" style="margin-top:6px;">
+      <button class="btn btn-outline" onclick="exportBackupJSON()">Export JSON Backup</button>
+      <button class="btn btn-outline" onclick="document.getElementById('backup-json-file').click()">Import JSON Backup</button>
+    </div>
+    <input type="file" id="backup-json-file" accept="application/json,.json" style="display:none;" onchange="importBackupJSON(this)">
+  </div>
+
+  <div class="card">
     <div class="card-title">Catalog รายการยอดนิยม</div>
     <p style="font-size:11px;color:var(--ink3);margin-bottom:10px;">คลิก tag เพื่อเพิ่มเข้ารายการโดยตรง</p>
     <div id="catalog-list"></div>
@@ -845,6 +935,77 @@ let settings   = JSON.parse(localStorage.getItem('vflaser_settings')||'{}');
 let catalog    = JSON.parse(localStorage.getItem('vflaser_catalog')||'[]');
 let qtCounter  = parseInt(localStorage.getItem('vflaser_counter')||'0');
 let filterStatus='', filterSource='', currentTemplate='engrave', editingId=null;
+let actionBusy=false;
+
+function setPrimaryActionBusy(isBusy, activeSelector='', activeText=''){
+  actionBusy=isBusy;
+  ['.btn-action-save','.btn-action-export','.btn-action-preview'].forEach(sel=>{
+    const btn=document.querySelector(sel);
+    if(!btn) return;
+    if(!btn.dataset.defaultText) btn.dataset.defaultText=btn.textContent.trim();
+    if(isBusy){
+      btn.disabled=true;
+      btn.classList.add('is-busy');
+      btn.textContent = sel===activeSelector && activeText ? activeText : btn.dataset.defaultText;
+    }else{
+      btn.disabled=false;
+      btn.classList.remove('is-busy');
+      btn.textContent = btn.dataset.defaultText;
+    }
+  });
+}
+
+function clearFieldErrors(){
+  document.querySelectorAll('.field-error').forEach(el=>el.classList.remove('field-error'));
+  document.querySelectorAll('.box-error').forEach(el=>el.classList.remove('box-error'));
+}
+
+function getItemRowByIndex(idx){
+  return document.querySelectorAll('.item-row')[idx]||null;
+}
+
+function validateQuotationData(data){
+  clearFieldErrors();
+  const errors=[];
+  let firstErrorEl=null;
+  const setFirst=(el)=>{ if(!firstErrorEl && el) firstErrorEl=el; };
+  if(!data.clientName || !data.clientName.trim()){
+    errors.push('กรุณากรอกชื่อลูกค้า');
+    const el=document.getElementById('client-name');
+    el?.classList.add('field-error');
+    setFirst(el);
+  }
+  if(!data.items.length){
+    errors.push('กรุณาเพิ่มรายการสินค้า/บริการอย่างน้อย 1 รายการ');
+    const el=document.getElementById('items-container');
+    el?.classList.add('box-error');
+    setFirst(el);
+  }
+  data.items.forEach((it,idx)=>{
+    const row=getItemRowByIndex(idx);
+    const inputs=row ? row.querySelectorAll('input') : [];
+    if(!it.name || !String(it.name).trim()){
+      errors.push(`รายการที่ ${idx+1}: กรุณากรอกชื่อรายการ`);
+      inputs[0]?.classList.add('field-error');
+      setFirst(inputs[0]);
+    }
+    if(!(it.qty>0)){
+      errors.push(`รายการที่ ${idx+1}: จำนวนต้องมากกว่า 0`);
+      inputs[1]?.classList.add('field-error');
+      setFirst(inputs[1]);
+    }
+    if(!(it.price>0)){
+      errors.push(`รายการที่ ${idx+1}: ราคา/หน่วยต้องมากกว่า 0`);
+      inputs[2]?.classList.add('field-error');
+      setFirst(inputs[2]);
+    }
+  });
+  if(firstErrorEl?.scrollIntoView){
+    firstErrorEl.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  return errors;
+}
+
 
 // ── TEMPLATES ──────────────────────────────────────────
 const tpl = {
@@ -1070,7 +1231,7 @@ function showPage(p, btn) {
   if(btn) btn.classList.add('active');
   if(p==='history'){renderHistory();}
   if(p==='dashboard'){renderDashboard();}
-  if(p==='settings'){loadSettings();renderCatalog();}
+  if(p==='settings'){loadSettings();renderCatalog();updatePdfFontStatus();}
   if(p==='connect'){loadScriptUrl();}
 }
 
@@ -1090,9 +1251,10 @@ function addItem(name='',qty=1,price=0) {
   const row = document.createElement('div');
   row.className='item-row'; row.id=id;
   row.innerHTML=`
-    <input type="text" value="${name}" placeholder="รายการ / บริการ" oninput="recalc()">
-    <input type="number" value="${qty}" min="1" oninput="recalc()">
-    <input type="number" value="${price}" min="0" step="0.01" oninput="recalc()">
+    <div class="item-no"></div>
+    <input class="item-name-input" type="text" value="${name}" placeholder="รายการ / บริการ" oninput="recalc()">
+    <input class="item-qty-input" type="number" value="${qty}" min="1" oninput="recalc()">
+    <input class="item-price-input" type="number" value="${price}" min="0" step="0.01" oninput="recalc()">
     <div class="item-subtotal" id="sub-${id}">฿${(qty*price).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
     <button class="btn-remove" onclick="removeItem('${id}')">×</button>
   `;
@@ -1103,8 +1265,11 @@ function addItem(name='',qty=1,price=0) {
 function removeItem(id){document.getElementById(id)?.remove();recalc();}
 
 function recalc() {
+  document.getElementById('items-container')?.classList.remove('box-error');
   let sub=0;
-  document.querySelectorAll('.item-row').forEach(row=>{
+  document.querySelectorAll('.item-row').forEach((row,idx)=>{
+    const no=row.querySelector('.item-no');
+    if(no) no.textContent=idx+1;
     const inp=row.querySelectorAll('input');
     const q=parseFloat(inp[1]?.value)||0;
     const p=parseFloat(inp[2]?.value)||0;
@@ -1131,7 +1296,9 @@ function checkRushFee() {
 
 function getFormData() {
   const items=[];
-  document.querySelectorAll('.item-row').forEach(row=>{
+  document.querySelectorAll('.item-row').forEach((row,idx)=>{
+    const no=row.querySelector('.item-no');
+    if(no) no.textContent=idx+1;
     const inp=row.querySelectorAll('input');
     items.push({name:inp[0]?.value||'',qty:parseFloat(inp[1]?.value)||0,price:parseFloat(inp[2]?.value)||0});
   });
@@ -1167,21 +1334,29 @@ function getFormData() {
   };
 }
 
-function saveQuotation() {
+async function saveQuotation() {
+  if(actionBusy) return;
   const data=getFormData();
-  if(!data.clientName){showToast('กรุณากรอกชื่อลูกค้า');return;}
-  if(editingId){
-    const idx=quotations.findIndex(q=>q.id===editingId);
-    if(idx!==-1) quotations[idx]=data;
-    editingId=null;
-  } else {
-    qtCounter++;
-    localStorage.setItem('vflaser_counter',String(qtCounter));
-    quotations.unshift(data);
+  const errors=validateQuotationData(data);
+  if(errors.length){showToast('ยังบันทึกไม่ได้\n• '+errors.slice(0,5).join('\n• '), 5200);return;}
+  setPrimaryActionBusy(true,'.btn-action-save','กำลังบันทึก...');
+  try{
+    if(editingId){
+      const idx=quotations.findIndex(q=>q.id===editingId);
+      if(idx!==-1) quotations[idx]=data;
+      editingId=null;
+    } else {
+      qtCounter++;
+      localStorage.setItem('vflaser_counter',String(qtCounter));
+      quotations.unshift(data);
+    }
+    localStorage.setItem('vflaser_quotes',JSON.stringify(quotations));
+    await new Promise(r=>setTimeout(r,250));
+    showToast('บันทึกใบเสนอราคาแล้ว');
+    genQTNum();
+  } finally {
+    setPrimaryActionBusy(false);
   }
-  localStorage.setItem('vflaser_quotes',JSON.stringify(quotations));
-  showToast('บันทึกใบเสนอราคาแล้ว');
-  genQTNum();
 }
 
 function duplicateForm() {
@@ -1238,163 +1413,298 @@ async function testConnection() {
 }
 
 // ── PDF EXPORT ─────────────────────────────────────────
-async function exportPDF() {
-  const data=getFormData();
-  if(!data.clientName){showToast('กรุณากรอกชื่อลูกค้า');return;}
-  if(typeof window.jspdf==='undefined'){showToast('⏳ โหลด PDF engine...');setTimeout(exportPDF,800);return;}
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({unit:'mm',format:'a4'});
-  const W=210,pH=297; let y=0;
+const PDF_FONT_CFG = {
+  family: 'THSarabun',
+  regularVfs: 'THSarabun.ttf',
+  boldVfs: 'THSarabun-Bold.ttf',
+  regularBase64: null,
+  boldBase64: null,
+  storageRegular: 'vflaser_pdf_font_thsarabun_regular',
+  storageBold: 'vflaser_pdf_font_thsarabun_bold',
+  regularUrlCandidates: ['./THSarabun.ttf','THSarabun.ttf','./THSarabun-Regular.ttf'],
+  boldUrlCandidates: ['./THSarabun Bold.ttf','./THSarabun%20Bold.ttf','THSarabun Bold.ttf','THSarabun%20Bold.ttf','./THSarabun-Bold.ttf']
+};
 
-  // Header
-  doc.setFillColor(26,26,26);doc.rect(0,0,W,44,'F');
-  doc.setTextColor(200,168,75);doc.setFontSize(17);doc.setFont('helvetica','bold');
-  doc.text(settings.brand||'VISION FOLD DESIGN',14,16);
-  doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(170,170,170);
-  doc.text('LASER ENGRAVING & PRINT SPECIALIST',14,22);
-  let cl='';
-  if(settings.phone)cl+=settings.phone+'  ';
-  if(settings.email)cl+=settings.email+'  ';
-  if(settings.line)cl+='Line: '+settings.line;
-  if(cl)doc.text(cl,14,28);
-  if(settings.address)doc.text(settings.address,14,34);
-  // Status badge
-  const scolor={draft:[120,120,120],sent:[26,111,189],approved:[42,122,42],rejected:[192,57,43],in_production:[212,67,14],delivered:[42,92,69]};
-  const sc=scolor[data.status]||[120,120,120];
-  doc.setFillColor(...sc);doc.roundedRect(W-50,8,38,12,3,3,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
-  doc.text(data.status.toUpperCase(),W-31,16,{align:'center'});
-  // QT number
-  doc.setTextColor(200,168,75);doc.setFontSize(13);
-  doc.text(data.number,W-14,26,{align:'right'});
-  doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(170,170,170);
-  doc.text('วันที่: '+data.quoteDate,W-14,32,{align:'right'});
-  doc.text('หมดอายุ: '+data.expireDate,W-14,38,{align:'right'});
-  y=52;
-
-  // Client + Project boxes
-  doc.setFillColor(247,246,243);doc.roundedRect(12,y,86,38,2,2,'F');
-  doc.setTextColor(136,136,136);doc.setFontSize(6.5);doc.setFont('helvetica','bold');
-  doc.text('เรียน / TO',16,y+7);
-  doc.setTextColor(26,26,26);doc.setFontSize(10);doc.setFont('helvetica','bold');
-  doc.text(data.clientName||'—',16,y+14);
-  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(68,68,68);
-  if(data.clientContact)doc.text('ผู้ติดต่อ: '+data.clientContact,16,y+20);
-  if(data.clientPhone)doc.text('โทร: '+data.clientPhone,16,y+26);
-  if(data.clientEmail)doc.text('Email: '+data.clientEmail,16,y+32);
-
-  doc.setFillColor(238,244,241);doc.roundedRect(102,y,96,38,2,2,'F');
-  doc.setTextColor(136,136,136);doc.setFontSize(6.5);doc.setFont('helvetica','bold');
-  doc.text('โปรเจกต์',106,y+7);
-  doc.setTextColor(26,26,26);doc.setFontSize(9);doc.setFont('helvetica','bold');
-  doc.text(doc.splitTextToSize(data.projectName||'—',84),106,y+14);
-  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(68,68,68);
-  doc.text('ระยะเวลา: '+data.leadTime,106,y+28);
-  doc.text('ชำระเงิน: '+data.paymentTerms,106,y+35);
-  y+=46;
-
-  // Items table header
-  doc.setFillColor(42,92,69);doc.rect(12,y,W-24,9,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(7.5);doc.setFont('helvetica','bold');
-  doc.text('รายการ',16,y+6);
-  doc.text('จำนวน',118,y+6,{align:'right'});
-  doc.text('ราคา/หน่วย',150,y+6,{align:'right'});
-  doc.text('รวม (฿)',W-14,y+6,{align:'right'});
-  y+=9;
-
-  data.items.forEach((it,i)=>{
-    if(y>pH-55){doc.addPage();y=20;}
-    doc.setFillColor(i%2===0?255:247,i%2===0?255:246,i%2===0?255:243);
-    doc.rect(12,y,W-24,8,'F');
-    doc.setTextColor(26,26,26);doc.setFontSize(8);doc.setFont('helvetica','normal');
-    doc.text(doc.splitTextToSize(it.name,90),16,y+5.5);
-    doc.text(it.qty.toLocaleString(),118,y+5.5,{align:'right'});
-    doc.text('฿'+it.price.toLocaleString('en',{minimumFractionDigits:2}),150,y+5.5,{align:'right'});
-    doc.text('฿'+(it.qty*it.price).toLocaleString('en',{minimumFractionDigits:2}),W-14,y+5.5,{align:'right'});
-    y+=8;
-  });
-  y+=4;
-
-  // Totals
-  const tX=128;
-  const tr=(lbl,val,bold,color)=>{
-    if(color)doc.setTextColor(...color);else doc.setTextColor(68,68,68);
-    doc.setFontSize(8.5);doc.setFont('helvetica',bold?'bold':'normal');
-    doc.text(lbl,tX,y);
-    doc.text('฿'+val.toLocaleString('en',{minimumFractionDigits:2}),W-14,y,{align:'right'});
-    y+=6;
-  };
-  tr('ยอดรวมก่อน VAT',data.subtotal);
-  if(data.useVat)tr('VAT 7%',data.vat);
-  if(data.discount>0)tr('ส่วนลด',-data.discount);
-  doc.setDrawColor(42,92,69);doc.setLineWidth(0.5);doc.line(tX,y,W-14,y);y+=4;
-  tr('ยอดรวมสุทธิ',data.total,true,[42,92,69]);
-
-  // Notes
-  if(data.notes){
-    y+=5;
-    const nl=doc.splitTextToSize(data.notes,W-32);
-    const nh=nl.length*5+9;
-    if(y+nh>pH-20){doc.addPage();y=20;}
-    doc.setFillColor(247,246,243);doc.roundedRect(12,y,W-24,nh,2,2,'F');
-    doc.setTextColor(136,136,136);doc.setFontSize(6.5);doc.setFont('helvetica','bold');
-    doc.text('หมายเหตุ',16,y+6);
-    doc.setTextColor(68,68,68);doc.setFontSize(7.5);doc.setFont('helvetica','normal');
-    doc.text(nl,16,y+11);
-    y+=nh+4;
+function arrayBufferToBase64(buffer){
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  let binary = '';
+  for(let i=0;i<bytes.length;i+=chunkSize){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i,i+chunkSize));
   }
-
-  // Delivery note
-  if(data.deliveryDate){
-    y+=2;
-    doc.setFillColor(212,67,14);doc.roundedRect(12,y,W-24,10,2,2,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
-    doc.text(' กำหนดส่งงาน: '+data.deliveryDate,W/2,y+7,{align:'center'});
-    y+=14;
-  }
-
-  // QR PromptPay ซ้ายล่าง
-  if(settings.promptpay) {
-    try {
-      const ppPayload = genPromptPayPayload(settings.promptpay, data.total);
-      const qrUrl = getQRUrl(ppPayload);
-      // วาด box พื้นหลัง
-      const qrY = pH - 52;
-      doc.setFillColor(238,244,241); doc.roundedRect(12, qrY, 52, 38, 2, 2, 'F');
-      doc.setTextColor(136,136,136); doc.setFontSize(6); doc.setFont('helvetica','bold');
-      doc.text('ชำระเงินผ่าน PromptPay', 38, qrY+5, {align:'center'});
-      // โหลด QR image
-      const qrImg = new Image(); qrImg.crossOrigin='anonymous';
-      await new Promise((resolve)=>{
-        qrImg.onload=resolve; qrImg.onerror=resolve;
-        qrImg.src=qrUrl;
-      });
-      if(qrImg.complete&&qrImg.naturalWidth>0){
-        doc.addImage(qrImg,'PNG',14,qrY+7,28,28);
-      }
-      doc.setTextColor(42,92,69); doc.setFontSize(6.5); doc.setFont('helvetica','bold');
-      doc.text(settings.promptpay, 38, qrY+30, {align:'center'});
-      doc.setFontSize(7); doc.setTextColor(26,26,26);
-      doc.text('฿'+data.total.toLocaleString('en',{minimumFractionDigits:2}), 38, qrY+35, {align:'center'});
-    } catch(e) {}
-  }
-
-  // Footer
-  doc.setFillColor(26,26,26);doc.rect(0,pH-14,W,14,'F');
-  doc.setTextColor(136,136,136);doc.setFontSize(6.5);doc.setFont('helvetica','normal');
-  doc.text((settings.brand||'VISION FOLD DESIGN')+'  •  Laser Engraving & Print Specialist  •  '+((settings.line&&'Line: '+settings.line)||''),W/2,pH-7,{align:'center'});
-  if(settings.web)doc.text(settings.web,W-14,pH-7,{align:'right'});
-
-  doc.save('QT_'+data.number+'_'+(data.clientName||'').replace(/\s/g,'_')+'.pdf');
-  showToast('Export PDF สำเร็จ');
+  return btoa(binary);
 }
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result||'');
+      resolve(result.includes(',') ? result.split(',').pop() : result);
+    };
+    reader.onerror = () => reject(reader.error||new Error('อ่านไฟล์ฟอนต์ไม่สำเร็จ'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function storePdfFontFromInput(input, weight){
+  const file = input?.files?.[0];
+  if(!file) return;
+  if(!/\.ttf$/i.test(file.name)){
+    showToast('ไฟล์ฟอนต์ต้องเป็น .ttf เท่านั้น');
+    input.value='';
+    return;
+  }
+  const b64 = await fileToBase64(file);
+  if(weight==='bold'){
+    localStorage.setItem(PDF_FONT_CFG.storageBold,b64);
+    PDF_FONT_CFG.boldBase64=b64;
+  } else {
+    localStorage.setItem(PDF_FONT_CFG.storageRegular,b64);
+    PDF_FONT_CFG.regularBase64=b64;
+  }
+  updatePdfFontStatus();
+  showToast('บันทึกฟอนต์ '+(weight==='bold'?'Bold':'Regular')+' แล้ว');
+}
+
+function clearStoredPdfFonts(){
+  localStorage.removeItem(PDF_FONT_CFG.storageRegular);
+  localStorage.removeItem(PDF_FONT_CFG.storageBold);
+  PDF_FONT_CFG.regularBase64=null;
+  PDF_FONT_CFG.boldBase64=null;
+  updatePdfFontStatus();
+  showToast('ล้างฟอนต์ที่จำไว้แล้ว');
+}
+
+function updatePdfFontStatus(){
+  const el = document.getElementById('pdf-font-status');
+  if(!el) return;
+  const hasReg = !!(PDF_FONT_CFG.regularBase64 || localStorage.getItem(PDF_FONT_CFG.storageRegular));
+  const hasBold = !!(PDF_FONT_CFG.boldBase64 || localStorage.getItem(PDF_FONT_CFG.storageBold));
+  if(hasReg && hasBold){
+    el.textContent = 'พร้อม Export PDF ด้วย THSarabun แล้ว';
+    el.style.color = 'var(--accent)';
+  } else {
+    el.textContent = 'ยังไม่ได้อัปโหลดฟอนต์ หรือยังไม่ได้วางไฟล์ THSarabun.ttf / THSarabun Bold.ttf ไว้ข้าง HTML';
+    el.style.color = 'var(--warning)';
+  }
+}
+
+async function fetchFontBase64(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Font not found: '+url);
+  return arrayBufferToBase64(await res.arrayBuffer());
+}
+
+async function fetchFirstAvailableFont(urls){
+  let lastErr;
+  for(const url of urls){
+    try { return await fetchFontBase64(url); }
+    catch(err){ lastErr = err; }
+  }
+  throw lastErr || new Error('Font not found');
+}
+
+async function resolvePdfFonts(){
+  const storedRegular = localStorage.getItem(PDF_FONT_CFG.storageRegular);
+  const storedBold = localStorage.getItem(PDF_FONT_CFG.storageBold);
+  if(storedRegular) PDF_FONT_CFG.regularBase64 = storedRegular;
+  if(storedBold) PDF_FONT_CFG.boldBase64 = storedBold;
+
+  if(!PDF_FONT_CFG.regularBase64){
+    PDF_FONT_CFG.regularBase64 = await fetchFirstAvailableFont(PDF_FONT_CFG.regularUrlCandidates);
+  }
+  if(!PDF_FONT_CFG.boldBase64){
+    PDF_FONT_CFG.boldBase64 = await fetchFirstAvailableFont(PDF_FONT_CFG.boldUrlCandidates);
+  }
+}
+
+async function registerPdfFonts(doc){
+  await resolvePdfFonts();
+  doc.addFileToVFS(PDF_FONT_CFG.regularVfs, PDF_FONT_CFG.regularBase64);
+  doc.addFont(PDF_FONT_CFG.regularVfs, PDF_FONT_CFG.family, 'normal');
+  doc.addFileToVFS(PDF_FONT_CFG.boldVfs, PDF_FONT_CFG.boldBase64);
+  doc.addFont(PDF_FONT_CFG.boldVfs, PDF_FONT_CFG.family, 'bold');
+  doc.setFont(PDF_FONT_CFG.family, 'normal');
+}
+
+async function generatePdf(mode='save') {
+  if(actionBusy) return;
+  const data=getFormData();
+  const errors=validateQuotationData(data);
+  if(errors.length){showToast('ยังสร้าง PDF ไม่ได้
+• '+errors.slice(0,5).join('
+• '), 5200);return;}
+  if(typeof window.jspdf==='undefined'){showToast('⏳ โหลด PDF engine...');setTimeout(()=>generatePdf(mode),800);return;}
+  setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังสร้าง Preview...' : 'กำลัง Export...');
+  try {
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    try {
+      await registerPdfFonts(doc);
+    } catch(e) {
+      console.error(e);
+      showToast('ไม่พบฟอนต์ THSarabun — ไปหน้า ตั้งค่า > PDF Font Export แล้วอัปโหลด Regular/Bold หรือวางไฟล์ .ttf คู่กับ HTML', 5200);
+      return;
+    }
+    const W=210,pH=297; let y=0;
+
+    doc.setFillColor(15,23,42);doc.rect(0,0,W,44,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(17);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.text(settings.brand||'VISION FOLD DESIGN',14,16);
+    doc.setFontSize(7);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(148,163,184);
+    doc.text('LASER ENGRAVING & PRINT SPECIALIST',14,22);
+    let cl='';
+    if(settings.phone)cl+=settings.phone+'  ';
+    if(settings.email)cl+=settings.email+'  ';
+    if(settings.line)cl+='Line: '+settings.line;
+    if(cl)doc.text(cl,14,28);
+    if(settings.address)doc.text(settings.address,14,34);
+    const scolor={draft:[120,120,120],sent:[26,111,189],approved:[42,122,42],rejected:[192,57,43],in_production:[212,67,14],delivered:[42,92,69]};
+    const sc=scolor[data.status]||[120,120,120];
+    doc.setFillColor(...sc);doc.roundedRect(W-50,8,38,12,3,3,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.text(data.status.toUpperCase(),W-31,16,{align:'center'});
+    doc.setTextColor(255,255,255);doc.setFontSize(13);
+    doc.text(data.number,W-14,26,{align:'right'});
+    doc.setFontSize(7);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(148,163,184);
+    doc.text('วันที่: '+data.quoteDate,W-14,32,{align:'right'});
+    doc.text('หมดอายุ: '+data.expireDate,W-14,38,{align:'right'});
+    y=52;
+
+    doc.setFillColor(248,250,252);doc.roundedRect(12,y,86,38,2,2,'F');
+    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.text('เรียน / TO',16,y+7);
+    doc.setTextColor(15,23,42);doc.setFontSize(10);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.text(data.clientName||'—',16,y+14);
+    doc.setFontSize(8);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(30,41,59);
+    if(data.clientContact)doc.text('ผู้ติดต่อ: '+data.clientContact,16,y+20);
+    if(data.clientPhone)doc.text('โทร: '+data.clientPhone,16,y+26);
+    if(data.clientEmail)doc.text('Email: '+data.clientEmail,16,y+32);
+
+    doc.setFillColor(239,246,255);doc.roundedRect(102,y,96,38,2,2,'F');
+    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.text('โปรเจกต์',106,y+7);
+    doc.setTextColor(15,23,42);doc.setFontSize(9);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.text(doc.splitTextToSize(data.projectName||'—',84),106,y+14);
+    doc.setFontSize(7.5);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(30,41,59);
+    doc.text('ระยะเวลา: '+data.leadTime,106,y+28);
+    doc.text('ชำระเงิน: '+data.paymentTerms,106,y+35);
+    y+=46;
+
+    const drawItemsHeader = ()=>{
+      doc.setFillColor(29,78,216);doc.rect(12,y,W-24,9,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.text('No.',16,y+6);
+      doc.text('รายการ',28,y+6);
+      doc.text('จำนวน',118,y+6,{align:'right'});
+      doc.text('ราคา/หน่วย',150,y+6,{align:'right'});
+      doc.text('รวม (฿)',W-14,y+6,{align:'right'});
+      y+=9;
+    };
+    drawItemsHeader();
+
+    data.items.forEach((it,i)=>{
+      const nameLines=doc.splitTextToSize(it.name || '—',78);
+      const rowHeight=Math.max(8, nameLines.length*4.4 + 3);
+      if(y+rowHeight>pH-55){doc.addPage();y=20;drawItemsHeader();}
+      doc.setFillColor(i%2===0?255:241,i%2===0?255:245,i%2===0?255:249);
+      doc.rect(12,y,W-24,rowHeight,'F');
+      const midY = y + rowHeight/2 + 1.2;
+      doc.setTextColor(15,23,42);doc.setFontSize(8);
+      doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.text(String(i+1),16,midY);
+      doc.setFont(PDF_FONT_CFG.family,'normal');
+      doc.text(nameLines,28,y+5.2);
+      doc.text(it.qty.toLocaleString(),118,midY,{align:'right'});
+      doc.text('฿'+it.price.toLocaleString('en',{minimumFractionDigits:2}),150,midY,{align:'right'});
+      doc.text('฿'+(it.qty*it.price).toLocaleString('en',{minimumFractionDigits:2}),W-14,midY,{align:'right'});
+      y+=rowHeight;
+    });
+    y+=4;
+
+    const tX=128;
+    const tr=(lbl,val,bold,color)=>{
+      if(color)doc.setTextColor(...color);else doc.setTextColor(30,41,59);
+      doc.setFontSize(8.5);doc.setFont(PDF_FONT_CFG.family,bold?'bold':'normal');
+      doc.text(lbl,tX,y);
+      doc.text('฿'+val.toLocaleString('en',{minimumFractionDigits:2}),W-14,y,{align:'right'});
+      y+=6;
+    };
+    tr('ยอดรวมก่อน VAT',data.subtotal);
+    if(data.useVat)tr('VAT 7%',data.vat);
+    if(data.discount>0)tr('ส่วนลด',-data.discount);
+    doc.setDrawColor(42,92,69);doc.setLineWidth(0.5);doc.line(tX,y,W-14,y);y+=4;
+    tr('ยอดรวมสุทธิ',data.total,true,[42,92,69]);
+
+    if(data.notes){
+      y+=5;
+      const nl=doc.splitTextToSize(data.notes,W-32);
+      const nh=nl.length*5+9;
+      if(y+nh>pH-20){doc.addPage();y=20;}
+      doc.setFillColor(248,250,252);doc.roundedRect(12,y,W-24,nh,2,2,'F');
+      doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.text('หมายเหตุ',16,y+6);
+      doc.setTextColor(30,41,59);doc.setFontSize(7.5);doc.setFont(PDF_FONT_CFG.family,'normal');
+      doc.text(nl,16,y+11);
+      y+=nh+4;
+    }
+
+    if(data.deliveryDate){
+      y+=2;
+      doc.setFillColor(212,67,14);doc.roundedRect(12,y,W-24,10,2,2,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.text(' กำหนดส่งงาน: '+data.deliveryDate,W/2,y+7,{align:'center'});
+      y+=14;
+    }
+
+    if(settings.promptpay) {
+      try {
+        const ppPayload = genPromptPayPayload(settings.promptpay, data.total);
+        const qrUrl = getQRUrl(ppPayload);
+        const qrY = pH - 52;
+        doc.setFillColor(239,246,255); doc.roundedRect(12, qrY, 52, 38, 2, 2, 'F');
+        doc.setTextColor(71,85,105); doc.setFontSize(6); doc.setFont(PDF_FONT_CFG.family,'bold');
+        doc.text('ชำระเงินผ่าน PromptPay', 38, qrY+5, {align:'center'});
+        const qrImg = new Image(); qrImg.crossOrigin='anonymous';
+        await new Promise((resolve)=>{ qrImg.onload=resolve; qrImg.onerror=resolve; qrImg.src=qrUrl; });
+        if(qrImg.complete&&qrImg.naturalWidth>0){ doc.addImage(qrImg,'PNG',14,qrY+7,28,28); }
+        doc.setTextColor(29,78,216); doc.setFontSize(6.5); doc.setFont(PDF_FONT_CFG.family,'bold');
+        doc.text(settings.promptpay, 38, qrY+30, {align:'center'});
+        doc.setFontSize(7); doc.setTextColor(15,23,42);
+        doc.text('฿'+data.total.toLocaleString('en',{minimumFractionDigits:2}), 38, qrY+35, {align:'center'});
+      } catch(e) {}
+    }
+
+    doc.setFillColor(15,23,42);doc.rect(0,pH-14,W,14,'F');
+    doc.setTextColor(148,163,184);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'normal');
+    doc.text((settings.brand||'VISION FOLD DESIGN')+'  •  Laser Engraving & Print Specialist  •  '+((settings.line&&'Line: '+settings.line)||''),W/2,pH-7,{align:'center'});
+    if(settings.web)doc.text(settings.web,W-14,pH-7,{align:'right'});
+
+    if(mode==='preview'){
+      const blob=doc.output('blob');
+      const url=URL.createObjectURL(blob);
+      window.open(url,'_blank');
+      setTimeout(()=>URL.revokeObjectURL(url),120000);
+      showToast('เปิด Preview PDF แล้ว');
+    }else{
+      doc.save('QT_'+data.number+'_'+(data.clientName||'').replace(/\s/g,'_')+'.pdf');
+      showToast('Export PDF สำเร็จ');
+    }
+  } finally {
+    setPrimaryActionBusy(false);
+  }
+}
+
+async function exportPDF(){ return generatePdf('save'); }
+async function previewPrint(){ return generatePdf('preview'); }
 
 // ── HISTORY v5 ─────────────────────────────────────────
 const HIST_PAGE_SIZE = 10;
 let histPage = 1;
 
 const STATUS_CFG = {
-  draft:        {lbl:'Draft',        cls:'s-draft',   dot:'#9ca3af'},
+  draft:        {lbl:'Draft',        cls:'s-draft',   dot:'#94a3b8'},
   sent:         {lbl:'Sent',         cls:'s-sent',    dot:'#3b82f6'},
   approved:     {lbl:'Approved',     cls:'s-approved',dot:'#10b981'},
   in_production:{lbl:'In Production',cls:'s-sent',    dot:'#f97316'},
@@ -1480,7 +1790,7 @@ function renderHistory() {
         </div>
         ${isFiltered
           ? `<button onclick="resetHistFilters()" style="padding:10px 22px;border:1px solid var(--line);border-radius:9px;background:var(--white);color:var(--ink2);font-size:13px;font-weight:600;cursor:pointer;">ล้างตัวกรอง</button>`
-          : `<button onclick="showPage('new',document.querySelectorAll('.nav-tab')[0])" style="padding:11px 24px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(42,92,69,.3);transition:all .15s;" onmouseover="this.style.background='#1e4a37'" onmouseout="this.style.background='var(--accent)'">สร้างใบเสนอราคาใบแรก</button>`
+          : `<button onclick="showPage('new',document.querySelectorAll('.nav-tab')[0])" style="padding:11px 24px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(29,78,216,.30);transition:all .15s;" onmouseover="this.style.background='#1e40af'" onmouseout="this.style.background='var(--accent)'">สร้างใบเสนอราคาใบแรก</button>`
         }
       </div>`;
     document.getElementById('hist-pagination').style.display='none';
@@ -1513,7 +1823,7 @@ function renderHistory() {
     </thead><tbody>`;
 
   paged.forEach((q,i)=>{
-    const cfg=STATUS_CFG[q.status]||{lbl:q.status,cls:'s-draft',dot:'#9ca3af'};
+    const cfg=STATUS_CFG[q.status]||{lbl:q.status,cls:'s-draft',dot:'#94a3b8'};
     const bg = i%2===0?'var(--white)':'var(--bg)';
     html+=`<tr style="background:${bg};transition:background .12s;" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='${bg}'">
       <td style="${tdS()}"><span style="font-weight:700;color:var(--accent);font-size:11px;">${q.number}</span></td>
@@ -1746,9 +2056,9 @@ function renderDashboard() {
 
   // Pipeline bars (clickable drill-down)
   const statusCfg={
-    draft:  {lbl:'Draft',      grad:'#9ca3af,#6b7280'},
+    draft:  {lbl:'Draft',      grad:'#94a3b8,#6b7280'},
     sent:   {lbl:'Sent',       grad:'#60a5fa,#3b82f6'},
-    approved:{lbl:'Approved',  grad:'#34d399,#10b981'},
+    approved:{lbl:'Approved',  grad:'#38bdf8,#10b981'},
     in_production:{lbl:'In Production',grad:'#fb923c,#f97316'},
     delivered:{lbl:'Delivered',grad:'#a78bfa,#8b5cf6'},
     rejected:{lbl:'Rejected',  grad:'#f87171,#ef4444'},
@@ -1776,7 +2086,7 @@ function renderDashboard() {
   // Donut Chart — ช่องทาง
   const srcLabels=['Line','Instagram','Walk-in','Email','Shopee/Lazada','Referral','อื่นๆ'];
   const srcKeys  =['line','instagram','walkin','email','shopee','referral','other'];
-  const srcColors=['#3b82f6','#ec4899','#10b981','#f59e0b','#8b5cf6','#06b6d4','#9ca3af'];
+  const srcColors=['#3b82f6','#ec4899','#10b981','#f59e0b','#8b5cf6','#06b6d4','#94a3b8'];
   const allForDonut=(quotations.length>0?quotations:MOCK_DATA);
   const srcVals=srcKeys.map(k=>allForDonut.filter(q=>q.clientSource===k).length);
   const srcTotal=srcVals.reduce((a,b)=>a+b,0)||1;
@@ -1979,9 +2289,65 @@ function deleteCatalog(i){
   renderCatalog();
 }
 
+
+// ── BACKUP JSON ───────────────────────────────────────
+function exportBackupJSON(){
+  const payload={
+    version:'1.0',
+    exportedAt:new Date().toISOString(),
+    quotations, settings, catalog, qtCounter
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='vf_laser_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast('Export JSON Backup สำเร็จ');
+}
+
+function importBackupJSON(input){
+  const file=input?.files?.[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const raw=JSON.parse(reader.result);
+      const incomingQuotes=Array.isArray(raw.quotations) ? raw.quotations : (Array.isArray(raw.quotes) ? raw.quotes : null);
+      if(!incomingQuotes) throw new Error('invalid-json');
+      if(!confirm('Import backup นี้จะเขียนทับข้อมูลใบเสนอราคา การตั้งค่า และ Catalog เดิม
+ยืนยันหรือไม่?')){ input.value=''; return; }
+      quotations=incomingQuotes;
+      settings=raw.settings||{};
+      catalog=Array.isArray(raw.catalog)?raw.catalog:[];
+      qtCounter=parseInt(raw.qtCounter ?? raw.counter ?? quotations.length ?? 0,10) || 0;
+      localStorage.setItem('vflaser_quotes',JSON.stringify(quotations));
+      localStorage.setItem('vflaser_settings',JSON.stringify(settings));
+      localStorage.setItem('vflaser_catalog',JSON.stringify(catalog));
+      localStorage.setItem('vflaser_counter',String(qtCounter));
+      loadSettings();
+      renderCatalog();
+      renderCatalogTags();
+      renderHistory();
+      renderDashboard();
+      clearFieldErrors();
+      showToast('Import JSON Backup สำเร็จ',4200);
+    }catch(err){
+      console.error(err);
+      showToast('ไฟล์ JSON ไม่ถูกต้อง หรือรูปแบบไม่รองรับ',4200);
+    }
+    input.value='';
+  };
+  reader.readAsText(file,'utf-8');
+}
+
 // ── CLEAR FORM ─────────────────────────────────────────
 function clearForm() {
   if(!confirm('ล้างฟอร์มทั้งหมด?'))return;
+  clearFieldErrors();
   editingId=null;
   ['client-name','client-contact','client-phone','client-email','client-address',
    'project-name','delivery-date','file-ref','internal-note'].forEach(id=>{
@@ -2002,12 +2368,12 @@ function clearForm() {
 
 // ── TOAST ──────────────────────────────────────────────
 let toastTimer;
-function showToast(msg){
+function showToast(msg,duration=2800){
   const el=document.getElementById('toast');
   document.getElementById('toast-msg').textContent=msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('show'),2800);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),duration);
 }
 
 // ── INIT ───────────────────────────────────────────────
