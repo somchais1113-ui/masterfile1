@@ -250,7 +250,7 @@ label,.card-title,.items-header span,.history-table th,.hist-table th{color:var(
     <div class="nav-logo">VF</div>
     <div>
       <div class="nav-title">VISION FOLD DESIGN — Laser Engrave</div>
-      <div class="nav-sub">Quotation & Business System v1.0</div>
+      <div class="nav-sub">Quotation & Business System v1.0 — dependency fixed</div>
     </div>
   </div>
   <div class="nav-tabs">
@@ -2742,6 +2742,88 @@ async function testConnection() {
   }
 }
 
+
+// ── DEPENDENCY LOADER: jsPDF / Chart.js ─────────────────
+function loadDependencyScriptOnce(key, urls, testFn, timeoutMs=14000){
+  if(typeof testFn === 'function' && testFn()) return Promise.resolve(true);
+  window.__vfDeps = window.__vfDeps || {};
+  if(window.__vfDeps[key]) return window.__vfDeps[key];
+  window.__vfDeps[key] = (async()=>{
+    for(const url of urls){
+      if(typeof testFn === 'function' && testFn()) return true;
+      const ok = await new Promise(resolve=>{
+        const script=document.createElement('script');
+        let done=false;
+        const timer=setTimeout(()=>{
+          if(done) return;
+          done=true;
+          script.onload=script.onerror=null;
+          try{script.remove();}catch(e){}
+          resolve(false);
+        }, timeoutMs);
+        script.onload=()=>{
+          if(done) return;
+          clearTimeout(timer);
+          setTimeout(()=>{
+            done=true;
+            resolve(typeof testFn === 'function' ? !!testFn() : true);
+          }, 30);
+        };
+        script.onerror=()=>{
+          if(done) return;
+          clearTimeout(timer);
+          done=true;
+          try{script.remove();}catch(e){}
+          resolve(false);
+        };
+        script.src=url;
+        script.async=true;
+        document.head.appendChild(script);
+      });
+      if(ok || (typeof testFn === 'function' && testFn())) return true;
+    }
+    return false;
+  })();
+  return window.__vfDeps[key];
+}
+
+function hasJsPDF(){ return !!(window.jspdf && window.jspdf.jsPDF); }
+function ensureJsPDFLoaded(){
+  return loadDependencyScriptOnce('jspdf', [
+    './jspdf.umd.min.js',
+    'jspdf.umd.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+    'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js'
+  ], hasJsPDF, 16000);
+}
+function hasChartJs(){ return typeof window.Chart !== 'undefined'; }
+function ensureChartJsLoaded(){
+  return loadDependencyScriptOnce('chartjs', [
+    './chart.umd.js',
+    'chart.umd.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js',
+    'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js'
+  ], hasChartJs, 12000);
+}
+
+function openPrintablePdfFallback(data){
+  const rows=(data.items||[]).map((it,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(it.name||'—')}</td><td class="num">${Number(it.qty||0).toLocaleString()}</td><td class="num">฿${Number(it.price||0).toLocaleString('en',{minimumFractionDigits:2})}</td><td class="num">฿${Number((it.qty||0)*(it.price||0)).toLocaleString('en',{minimumFractionDigits:2})}</td></tr>`).join('');
+  const html=`<!doctype html><html lang="th"><head><meta charset="utf-8"><title>${escapeHtml(data.number||'Quotation')}</title><style>
+    @font-face{font-family:THSarabun;src:url('./THSarabun.ttf')}*{box-sizing:border-box}body{font-family:THSarabun,Arial,sans-serif;margin:0;color:#0f172a;background:#fff;font-size:16px}.page{width:210mm;min-height:297mm;margin:0 auto;padding:14mm}.head{background:#0f172a;color:#fff;padding:18px 22px;border-radius:10px;display:flex;justify-content:space-between}.brand{font-size:28px;font-weight:700}.muted{color:#64748b}.white-muted{color:#cbd5e1}.box{border:1px solid #cbd5e1;border-radius:10px;padding:14px;margin-top:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}table{width:100%;border-collapse:collapse;margin-top:14px}th{background:#1d4ed8;color:#fff;text-align:left;padding:8px}td{border-bottom:1px solid #e2e8f0;padding:8px}.num{text-align:right}.totals{margin-left:auto;width:75mm;margin-top:10px}.totals div{display:flex;justify-content:space-between;padding:4px 0}.grand{font-size:22px;font-weight:700;color:#1d4ed8;border-top:2px solid #1d4ed8;margin-top:6px;padding-top:8px}.note{white-space:pre-wrap}@media print{.no-print{display:none}.page{margin:0;box-shadow:none}.box{break-inside:avoid}}</style></head><body><div class="page">
+    <div class="head"><div><div class="brand">${escapeHtml(settings.brand||'VISION FOLD DESIGN')}</div><div class="white-muted">Laser Engraving & Print Specialist</div></div><div style="text-align:right"><div>${escapeHtml(data.number||'')}</div><div class="white-muted">วันที่ ${escapeHtml(data.quoteDate||'')}</div><div class="white-muted">หมดอายุ ${escapeHtml(data.expireDate||'')}</div></div></div>
+    <div class="grid"><div class="box"><strong>เรียน / TO</strong><br>${escapeHtml(data.clientName||'—')}<br>${escapeHtml(data.clientContact||'')}<br>${escapeHtml(data.clientPhone||'')}<br>${escapeHtml(data.clientEmail||'')}</div><div class="box"><strong>โปรเจกต์</strong><br>${escapeHtml(data.projectName||'—')}<br>ระยะเวลา: ${escapeHtml(data.leadTime||'')}<br>ชำระเงิน: ${escapeHtml(data.paymentTerms||'')}</div></div>
+    <table><thead><tr><th>No.</th><th>รายการ</th><th class="num">จำนวน</th><th class="num">ราคา/หน่วย</th><th class="num">รวม</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="totals"><div><span>ยอดรวมก่อน VAT</span><strong>฿${Number(data.subtotal||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>${data.useVat?`<div><span>VAT 7%</span><strong>฿${Number(data.vat||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>`:''}${data.discount>0?`<div><span>ส่วนลด</span><strong>-฿${Number(data.discount||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>`:''}<div class="grand"><span>ยอดรวมสุทธิ</span><span>฿${Number(data.total||0).toLocaleString('en',{minimumFractionDigits:2})}</span></div></div>
+    ${data.notes?`<div class="box note"><strong>หมายเหตุ</strong><br>${escapeHtml(data.notes)}</div>`:''}
+    <p class="muted no-print">ระบบเปิดหน้า Print PDF สำรองให้แล้ว ให้เลือก Destination: Save as PDF</p>
+    <script>window.onload=function(){setTimeout(function(){window.print()},350)}<\/script>
+  </div></body></html>`;
+  const w=window.open('', '_blank');
+  if(!w){ showToast('Browser บล็อก popup — กด Preview Print / Test PDF แล้วอนุญาต popup', 5200); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  showToast('ไม่พบ jsPDF — เปิด Print PDF สำรองแล้ว เลือก Save as PDF', 5200);
+}
+
 // ── PDF EXPORT ─────────────────────────────────────────
 const PDF_FONT_CFG = {
   family: 'THSarabun',
@@ -2882,24 +2964,32 @@ async function generatePdf(mode='save') {
   const data=getFormData();
   const errors=validateQuotationData(data);
   if(errors.length){showToast('ยังสร้าง PDF ไม่ได้\n• '+errors.slice(0,5).join('\n• '), 5200);return;}
-  if(typeof window.jspdf==='undefined'){showToast('ยัง Export PDF ไม่ได้ — ไม่พบ jsPDF ให้เปิดเน็ต หรือวางไฟล์ jspdf.umd.min.js ไว้โฟลเดอร์เดียวกับ HTML',5200);return;}
+  setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังโหลด PDF...' : 'กำลังโหลด PDF...');
+  const jsPdfReady = await ensureJsPDFLoaded();
+  if(!jsPdfReady){
+    setPrimaryActionBusy(false);
+    openPrintablePdfFallback(data);
+    return;
+  }
   setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังสร้าง Preview...' : 'กำลัง Export...');
   try {
     const {jsPDF}=window.jspdf;
     const doc=new jsPDF({unit:'mm',format:'a4'});
+    let pdfFontFamily = pdfFontFamily;
     try {
       await registerPdfFonts(doc);
     } catch(e) {
       console.error(e);
-      showToast('ไม่พบฟอนต์ THSarabun — ไปหน้า ตั้งค่า > PDF Font Export แล้วอัปโหลด Regular/Bold หรือวางไฟล์ .ttf คู่กับ HTML', 5200);
-      return;
+      pdfFontFamily = 'helvetica';
+      doc.setFont(pdfFontFamily,'normal');
+      showToast('ไม่พบฟอนต์ THSarabun — สร้าง PDF ต่อด้วยฟอนต์สำรองก่อน ถ้าต้องการภาษาไทยคมชัดให้อัปโหลด/วางไฟล์ฟอนต์', 5200);
     }
     const W=210,pH=297; let y=0;
 
     doc.setFillColor(15,23,42);doc.rect(0,0,W,44,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(17);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.setTextColor(255,255,255);doc.setFontSize(17);doc.setFont(pdfFontFamily,'bold');
     doc.text(settings.brand||'VISION FOLD DESIGN',14,16);
-    doc.setFontSize(7);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(148,163,184);
+    doc.setFontSize(7);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(148,163,184);
     doc.text('LASER ENGRAVING & PRINT SPECIALIST',14,22);
     let cl='';
     if(settings.phone)cl+=settings.phone+'  ';
@@ -2910,38 +3000,38 @@ async function generatePdf(mode='save') {
     const scolor={draft:[120,120,120],sent:[26,111,189],approved:[42,122,42],rejected:[192,57,43],in_production:[212,67,14],delivered:[42,92,69]};
     const sc=scolor[data.status]||[120,120,120];
     doc.setFillColor(...sc);doc.roundedRect(W-50,8,38,12,3,3,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(pdfFontFamily,'bold');
     doc.text(data.status.toUpperCase(),W-31,16,{align:'center'});
     doc.setTextColor(255,255,255);doc.setFontSize(13);
     doc.text(data.number,W-14,26,{align:'right'});
-    doc.setFontSize(7);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(148,163,184);
+    doc.setFontSize(7);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(148,163,184);
     doc.text('วันที่: '+data.quoteDate,W-14,32,{align:'right'});
     doc.text('หมดอายุ: '+data.expireDate,W-14,38,{align:'right'});
     y=52;
 
     doc.setFillColor(248,250,252);doc.roundedRect(12,y,86,38,2,2,'F');
-    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'bold');
     doc.text('เรียน / TO',16,y+7);
-    doc.setTextColor(15,23,42);doc.setFontSize(10);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.setTextColor(15,23,42);doc.setFontSize(10);doc.setFont(pdfFontFamily,'bold');
     doc.text(data.clientName||'—',16,y+14);
-    doc.setFontSize(8);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(30,41,59);
+    doc.setFontSize(8);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(30,41,59);
     if(data.clientContact)doc.text('ผู้ติดต่อ: '+data.clientContact,16,y+20);
     if(data.clientPhone)doc.text('โทร: '+data.clientPhone,16,y+26);
     if(data.clientEmail)doc.text('Email: '+data.clientEmail,16,y+32);
 
     doc.setFillColor(239,246,255);doc.roundedRect(102,y,96,38,2,2,'F');
-    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'bold');
     doc.text('โปรเจกต์',106,y+7);
-    doc.setTextColor(15,23,42);doc.setFontSize(9);doc.setFont(PDF_FONT_CFG.family,'bold');
+    doc.setTextColor(15,23,42);doc.setFontSize(9);doc.setFont(pdfFontFamily,'bold');
     doc.text(doc.splitTextToSize(data.projectName||'—',84),106,y+14);
-    doc.setFontSize(7.5);doc.setFont(PDF_FONT_CFG.family,'normal');doc.setTextColor(30,41,59);
+    doc.setFontSize(7.5);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(30,41,59);
     doc.text('ระยะเวลา: '+data.leadTime,106,y+28);
     doc.text('ชำระเงิน: '+data.paymentTerms,106,y+35);
     y+=46;
 
     const drawItemsHeader = ()=>{
       doc.setFillColor(29,78,216);doc.rect(12,y,W-24,9,'F');
-      doc.setTextColor(255,255,255);doc.setFontSize(7.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.setTextColor(255,255,255);doc.setFontSize(7.5);doc.setFont(pdfFontFamily,'bold');
       doc.text('No.',16,y+6);
       doc.text('รายการ',28,y+6);
       doc.text('จำนวน',118,y+6,{align:'right'});
@@ -2959,9 +3049,9 @@ async function generatePdf(mode='save') {
       doc.rect(12,y,W-24,rowHeight,'F');
       const midY = y + rowHeight/2 + 1.2;
       doc.setTextColor(15,23,42);doc.setFontSize(8);
-      doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.setFont(pdfFontFamily,'bold');
       doc.text(String(i+1),16,midY);
-      doc.setFont(PDF_FONT_CFG.family,'normal');
+      doc.setFont(pdfFontFamily,'normal');
       doc.text(nameLines,28,y+5.2);
       doc.text(it.qty.toLocaleString(),118,midY,{align:'right'});
       doc.text('฿'+it.price.toLocaleString('en',{minimumFractionDigits:2}),150,midY,{align:'right'});
@@ -2973,7 +3063,7 @@ async function generatePdf(mode='save') {
     const tX=128;
     const tr=(lbl,val,bold,color)=>{
       if(color)doc.setTextColor(...color);else doc.setTextColor(30,41,59);
-      doc.setFontSize(8.5);doc.setFont(PDF_FONT_CFG.family,bold?'bold':'normal');
+      doc.setFontSize(8.5);doc.setFont(pdfFontFamily,bold?'bold':'normal');
       doc.text(lbl,tX,y);
       doc.text('฿'+val.toLocaleString('en',{minimumFractionDigits:2}),W-14,y,{align:'right'});
       y+=6;
@@ -2990,9 +3080,9 @@ async function generatePdf(mode='save') {
       const nh=nl.length*5+9;
       if(y+nh>pH-20){doc.addPage();y=20;}
       doc.setFillColor(248,250,252);doc.roundedRect(12,y,W-24,nh,2,2,'F');
-      doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'bold');
       doc.text('หมายเหตุ',16,y+6);
-      doc.setTextColor(30,41,59);doc.setFontSize(7.5);doc.setFont(PDF_FONT_CFG.family,'normal');
+      doc.setTextColor(30,41,59);doc.setFontSize(7.5);doc.setFont(pdfFontFamily,'normal');
       doc.text(nl,16,y+11);
       y+=nh+4;
     }
@@ -3000,7 +3090,7 @@ async function generatePdf(mode='save') {
     if(data.deliveryDate){
       y+=2;
       doc.setFillColor(212,67,14);doc.roundedRect(12,y,W-24,10,2,2,'F');
-      doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(PDF_FONT_CFG.family,'bold');
+      doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(pdfFontFamily,'bold');
       doc.text(' กำหนดส่งงาน: '+data.deliveryDate,W/2,y+7,{align:'center'});
       y+=14;
     }
@@ -3010,12 +3100,12 @@ async function generatePdf(mode='save') {
         const ppPayload = genPromptPayPayload(settings.promptpay, data.total);
         const qrY = pH - 52;
         doc.setFillColor(239,246,255); doc.roundedRect(12, qrY, 52, 38, 2, 2, 'F');
-        doc.setTextColor(71,85,105); doc.setFontSize(6); doc.setFont(PDF_FONT_CFG.family,'bold');
+        doc.setTextColor(71,85,105); doc.setFontSize(6); doc.setFont(pdfFontFamily,'bold');
         doc.text('ชำระเงินผ่าน PromptPay', 38, qrY+5, {align:'center'});
         const qrPng = await qrPayloadToPngDataUrl(ppPayload, 240);
         if(qrPng){ doc.addImage(qrPng,'PNG',14,qrY+7,28,28); }
         else { doc.setFontSize(6); doc.setTextColor(185,28,28); doc.text('QR ERROR', 28, qrY+22, {align:'center'}); }
-        doc.setTextColor(29,78,216); doc.setFontSize(6.5); doc.setFont(PDF_FONT_CFG.family,'bold');
+        doc.setTextColor(29,78,216); doc.setFontSize(6.5); doc.setFont(pdfFontFamily,'bold');
         doc.text(settings.promptpay, 38, qrY+30, {align:'center'});
         doc.setFontSize(7); doc.setTextColor(15,23,42);
         doc.text('฿'+data.total.toLocaleString('en',{minimumFractionDigits:2}), 38, qrY+35, {align:'center'});
@@ -3023,7 +3113,7 @@ async function generatePdf(mode='save') {
     }
 
     doc.setFillColor(15,23,42);doc.rect(0,pH-14,W,14,'F');
-    doc.setTextColor(148,163,184);doc.setFontSize(6.5);doc.setFont(PDF_FONT_CFG.family,'normal');
+    doc.setTextColor(148,163,184);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'normal');
     doc.text((settings.brand||'VISION FOLD DESIGN')+'  •  Laser Engraving & Print Specialist  •  '+((settings.line&&'Line: '+settings.line)||''),W/2,pH-7,{align:'center'});
     if(settings.web)doc.text(settings.web,W-14,pH-7,{align:'right'});
 
@@ -3321,6 +3411,63 @@ const MOCK_DATA = [
 let dbDrillStatus=null, dbDrillMonth=null;
 let revenueChart=null, donutChart=null;
 
+let chartJsRedrawQueued=false;
+function queueChartJsRedraw(){
+  if(chartJsRedrawQueued || hasChartJs()) return;
+  chartJsRedrawQueued=true;
+  ensureChartJsLoaded().then(ok=>{
+    chartJsRedrawQueued=false;
+    const dash=document.getElementById('page-dashboard');
+    if(ok && dash && dash.classList.contains('active')) renderDashboard();
+  }).catch(()=>{chartJsRedrawQueued=false;});
+}
+
+function drawNativeDonut(canvas, labels, values, colors){
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  if(!ctx) return;
+  const parent=canvas.parentElement;
+  const rect=canvas.getBoundingClientRect();
+  const cssW=Math.max(260, Math.round(rect.width || parent?.clientWidth || 360));
+  const cssH=Math.max(190, Math.round(rect.height || parent?.clientHeight || 200));
+  const dpr=window.devicePixelRatio||1;
+  canvas.style.width='100%';
+  canvas.style.height=cssH+'px';
+  canvas.width=Math.round(cssW*dpr);
+  canvas.height=Math.round(cssH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cssW,cssH);
+  const total=values.reduce((a,b)=>a+Number(b||0),0);
+  const cx=cssW/2, cy=cssH/2;
+  const r=Math.min(cssW,cssH)*0.34;
+  const line=Math.max(28, Math.min(cssW,cssH)*0.16);
+  ctx.lineWidth=line;
+  ctx.lineCap='butt';
+  if(total<=0){
+    ctx.strokeStyle='#e2e8f0';
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='#64748b';ctx.font='700 14px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ไม่มีข้อมูล',cx,cy);
+    return;
+  }
+  let start=-Math.PI/2;
+  values.forEach((v,i)=>{
+    v=Number(v||0);
+    if(v<=0) return;
+    const end=start+(v/total)*Math.PI*2;
+    ctx.strokeStyle=colors[i]||'#94a3b8';
+    ctx.beginPath();ctx.arc(cx,cy,r,start,end);ctx.stroke();
+    start=end;
+  });
+  ctx.fillStyle='#0f172a';
+  ctx.font='800 28px system-ui,-apple-system,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(String(total),cx,cy-7);
+  ctx.fillStyle='#64748b';
+  ctx.font='700 12px system-ui,-apple-system,sans-serif';
+  ctx.fillText('INQUIRY',cx,cy+18);
+}
+
+
 function getDashFilters() {
   return {
     period: document.getElementById('df-period')?.value||'all',
@@ -3440,10 +3587,12 @@ function renderDashboard() {
   if(donutChart) donutChart.destroy();
   const dCtx=document.getElementById('source-donut');
   if(dCtx && typeof Chart==='undefined'){
-    dCtx.style.display='none';
+    dCtx.style.display='block';
+    drawNativeDonut(dCtx, srcLabels, srcVals, srcColors);
+    queueChartJsRedraw();
     document.getElementById('donut-legend').innerHTML=srcLabels.map((l,i)=>{
       const pct=Math.round(srcVals[i]/srcTotal*100);
-      return srcVals[i]>0?`<div style="width:100%;font-size:11px;margin-bottom:5px;"><div style="display:flex;justify-content:space-between;"><span>${l}</span><strong>${srcVals[i]} ใบ · ${pct}%</strong></div><div style="height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${srcColors[i]};"></div></div></div>`:'';
+      return srcVals[i]>0?`<span style="display:flex;align-items:center;gap:5px;font-size:11px;"><span style="width:9px;height:9px;border-radius:50%;background:${srcColors[i]};display:inline-block;"></span>${l} ${srcVals[i]} ใบ · ${pct}%</span>`:'';
     }).join('') || '<span style="font-size:12px;color:var(--ink3);">ยังไม่มีข้อมูลช่องทาง</span>';
   } else if(dCtx){
     dCtx.style.display='block';
@@ -3485,6 +3634,7 @@ function renderDashboard() {
   if(revenueChart) revenueChart.destroy();
   const rCtx=document.getElementById('revenue-bar');
   if(rCtx && typeof Chart==='undefined'){
+    queueChartJsRedraw();
     rCtx.style.display='none';
     let fb=document.getElementById('revenue-bar-fallback');
     if(!fb){fb=document.createElement('div');fb.id='revenue-bar-fallback';rCtx.parentElement.appendChild(fb);}
