@@ -901,7 +901,7 @@ label,.card-title,.items-header span,.history-table th,.hist-table th{color:var(
   <div class="card">
     <div class="card-title">PDF Font Export</div>
     <p style="font-size:12px;color:var(--ink3);line-height:1.7;margin-bottom:12px;">
-      ใช้ฟอนต์ THSarabun สำหรับ Export PDF ภาษาไทย/อังกฤษ ถ้าเปิดไฟล์ผ่าน browser แล้วระบบหาไฟล์ฟอนต์ไม่เจอ ให้อัปโหลดฟอนต์ 2 ไฟล์นี้ครั้งเดียว ระบบจะจำไว้ในเครื่องนี้
+      Export PDF ปัจจุบันใช้โหมด Image PDF เพื่อให้ภาษาไทยแสดงผลถูกต้องเสมอ การอัปโหลดฟอนต์ยังเก็บไว้เป็นตัวเลือกสำรองสำหรับเครื่องที่ต้องการใช้ THSarabun โดยตรง
     </p>
     <div class="form-grid">
       <div class="form-group">
@@ -2809,14 +2809,14 @@ function ensureChartJsLoaded(){
 }
 
 function openPrintablePdfFallback(data){
-  const rows=(data.items||[]).map((it,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(it.name||'—')}</td><td class="num">${Number(it.qty||0).toLocaleString()}</td><td class="num">฿${Number(it.price||0).toLocaleString('en',{minimumFractionDigits:2})}</td><td class="num">฿${Number((it.qty||0)*(it.price||0)).toLocaleString('en',{minimumFractionDigits:2})}</td></tr>`).join('');
-  const html=`<!doctype html><html lang="th"><head><meta charset="utf-8"><title>${escapeHtml(data.number||'Quotation')}</title><style>
+  const rows=(data.items||[]).map((it,i)=>`<tr><td>${i+1}</td><td>${pdfEscapeHtml(it.name||'—')}</td><td class="num">${Number(it.qty||0).toLocaleString()}</td><td class="num">฿${Number(it.price||0).toLocaleString('en',{minimumFractionDigits:2})}</td><td class="num">฿${Number((it.qty||0)*(it.price||0)).toLocaleString('en',{minimumFractionDigits:2})}</td></tr>`).join('');
+  const html=`<!doctype html><html lang="th"><head><meta charset="utf-8"><title>${pdfEscapeHtml(data.number||'Quotation')}</title><style>
     @font-face{font-family:THSarabun;src:url('./THSarabun.ttf')}*{box-sizing:border-box}body{font-family:THSarabun,Arial,sans-serif;margin:0;color:#0f172a;background:#fff;font-size:16px}.page{width:210mm;min-height:297mm;margin:0 auto;padding:14mm}.head{background:#0f172a;color:#fff;padding:18px 22px;border-radius:10px;display:flex;justify-content:space-between}.brand{font-size:28px;font-weight:700}.muted{color:#64748b}.white-muted{color:#cbd5e1}.box{border:1px solid #cbd5e1;border-radius:10px;padding:14px;margin-top:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}table{width:100%;border-collapse:collapse;margin-top:14px}th{background:#1d4ed8;color:#fff;text-align:left;padding:8px}td{border-bottom:1px solid #e2e8f0;padding:8px}.num{text-align:right}.totals{margin-left:auto;width:75mm;margin-top:10px}.totals div{display:flex;justify-content:space-between;padding:4px 0}.grand{font-size:22px;font-weight:700;color:#1d4ed8;border-top:2px solid #1d4ed8;margin-top:6px;padding-top:8px}.note{white-space:pre-wrap}@media print{.no-print{display:none}.page{margin:0;box-shadow:none}.box{break-inside:avoid}}</style></head><body><div class="page">
-    <div class="head"><div><div class="brand">${escapeHtml(settings.brand||'VISION FOLD DESIGN')}</div><div class="white-muted">Laser Engraving & Print Specialist</div></div><div style="text-align:right"><div>${escapeHtml(data.number||'')}</div><div class="white-muted">วันที่ ${escapeHtml(data.quoteDate||'')}</div><div class="white-muted">หมดอายุ ${escapeHtml(data.expireDate||'')}</div></div></div>
-    <div class="grid"><div class="box"><strong>เรียน / TO</strong><br>${escapeHtml(data.clientName||'—')}<br>${escapeHtml(data.clientContact||'')}<br>${escapeHtml(data.clientPhone||'')}<br>${escapeHtml(data.clientEmail||'')}</div><div class="box"><strong>โปรเจกต์</strong><br>${escapeHtml(data.projectName||'—')}<br>ระยะเวลา: ${escapeHtml(data.leadTime||'')}<br>ชำระเงิน: ${escapeHtml(data.paymentTerms||'')}</div></div>
+    <div class="head"><div><div class="brand">${pdfEscapeHtml(settings.brand||'VISION FOLD DESIGN')}</div><div class="white-muted">Laser Engraving & Print Specialist</div></div><div style="text-align:right"><div>${pdfEscapeHtml(data.number||'')}</div><div class="white-muted">วันที่ ${pdfEscapeHtml(data.quoteDate||'')}</div><div class="white-muted">หมดอายุ ${pdfEscapeHtml(data.expireDate||'')}</div></div></div>
+    <div class="grid"><div class="box"><strong>เรียน / TO</strong><br>${pdfEscapeHtml(data.clientName||'—')}<br>${pdfEscapeHtml(data.clientContact||'')}<br>${pdfEscapeHtml(data.clientPhone||'')}<br>${pdfEscapeHtml(data.clientEmail||'')}</div><div class="box"><strong>โปรเจกต์</strong><br>${pdfEscapeHtml(data.projectName||'—')}<br>ระยะเวลา: ${pdfEscapeHtml(data.leadTime||'')}<br>ชำระเงิน: ${pdfEscapeHtml(data.paymentTerms||'')}</div></div>
     <table><thead><tr><th>No.</th><th>รายการ</th><th class="num">จำนวน</th><th class="num">ราคา/หน่วย</th><th class="num">รวม</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="totals"><div><span>ยอดรวมก่อน VAT</span><strong>฿${Number(data.subtotal||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>${data.useVat?`<div><span>VAT 7%</span><strong>฿${Number(data.vat||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>`:''}${data.discount>0?`<div><span>ส่วนลด</span><strong>-฿${Number(data.discount||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>`:''}<div class="grand"><span>ยอดรวมสุทธิ</span><span>฿${Number(data.total||0).toLocaleString('en',{minimumFractionDigits:2})}</span></div></div>
-    ${data.notes?`<div class="box note"><strong>หมายเหตุ</strong><br>${escapeHtml(data.notes)}</div>`:''}
+    ${data.notes?`<div class="box note"><strong>หมายเหตุ</strong><br>${pdfEscapeHtml(data.notes)}</div>`:''}
     <p class="muted no-print">ระบบเปิดหน้า Print PDF สำรองให้แล้ว ให้เลือก Destination: Save as PDF</p>
     <script>window.onload=function(){setTimeout(function(){window.print()},350)}<\/script>
   </div></body></html>`;
@@ -2827,6 +2827,37 @@ function openPrintablePdfFallback(data){
 }
 
 // ── PDF EXPORT ─────────────────────────────────────────
+function pdfEscapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[ch]));
+}
+
+function pdfText(value, fallback='—'){
+  const txt = String(value ?? '').trim();
+  return txt ? pdfEscapeHtml(txt) : fallback;
+}
+
+function pdfMoney(value){
+  return '฿'+Number(value||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function pdfStatusLabel(status){
+  const labels={
+    draft:'Draft',
+    sent:'Sent',
+    approved:'Approved',
+    rejected:'Rejected',
+    in_production:'In Production',
+    delivered:'Delivered'
+  };
+  return labels[status] || status || 'Draft';
+}
+
 const PDF_FONT_CFG = {
   family: 'THSarabun',
   regularVfs: 'THSarabun.ttf',
@@ -2899,8 +2930,8 @@ function updatePdfFontStatus(){
     el.textContent = 'พร้อม Export PDF ด้วย THSarabun แล้ว';
     el.style.color = 'var(--accent)';
   } else {
-    el.textContent = 'ยังไม่ได้อัปโหลดฟอนต์ หรือยังไม่ได้วางไฟล์ THSarabun.ttf / THSarabun Bold.ttf ไว้ข้าง HTML';
-    el.style.color = 'var(--warning)';
+    el.textContent = 'Export PDF ใช้โหมด Image PDF แล้ว จึงไม่ต้องฝังฟอนต์ไทยเพิ่มเติม';
+    el.style.color = 'var(--accent)';
   }
 }
 
@@ -2961,6 +2992,181 @@ async function qrPayloadToPngDataUrl(payload, size=180){
   });
 }
 
+async function buildImagePdfHtml(data){
+  const rows=(data.items||[]).map((it,i)=>{
+    const total=(Number(it.qty)||0)*(Number(it.price)||0);
+    return `<tr>
+      <td class="c-no">${i+1}</td>
+      <td class="c-name">${pdfText(it.name)}</td>
+      <td class="num">${Number(it.qty||0).toLocaleString()}</td>
+      <td class="num">${pdfMoney(it.price)}</td>
+      <td class="num strong">${pdfMoney(total)}</td>
+    </tr>`;
+  }).join('');
+  const contact=[
+    settings.phone,
+    settings.email,
+    settings.line ? 'Line: '+settings.line : '',
+    settings.web
+  ].filter(Boolean).map(pdfEscapeHtml).join('  |  ');
+  let qrHtml='';
+  if(settings.promptpay){
+    try{
+      const payload=genPromptPayPayload(settings.promptpay, data.total);
+      const qrPng=await qrPayloadToPngDataUrl(payload,240);
+      const src=qrPng || getQRUrl(payload);
+      qrHtml=`<div class="qr-box">
+        <div class="qr-title">ชำระเงินผ่าน PromptPay</div>
+        <img src="${src}" alt="PromptPay QR">
+        <div class="qr-id">${pdfEscapeHtml(settings.promptpay)}</div>
+        <div class="qr-amt">${pdfMoney(data.total)}</div>
+      </div>`;
+    }catch(e){}
+  }
+  return `<div class="pdf-page" xmlns="http://www.w3.org/1999/xhtml">
+    <style>
+      *{box-sizing:border-box}
+      .pdf-page{width:1240px;min-height:1753px;background:#fff;color:#0f172a;padding:80px 74px 70px;font-family:'TH Sarabun New','THSarabun','Sukhumvit Set','Noto Sans Thai','Tahoma','Arial',sans-serif;font-size:24px;line-height:1.45}
+      .pdf-head{background:#0f172a;color:#fff;border-radius:18px;padding:34px 40px;display:flex;justify-content:space-between;gap:36px}
+      .brand{font-size:44px;font-weight:800;letter-spacing:.5px}
+      .sub{font-size:18px;color:#cbd5e1;text-transform:uppercase;letter-spacing:2px;margin-top:5px}
+      .contact{font-size:18px;color:#d1d5db;margin-top:14px}
+      .quote-side{text-align:right;min-width:320px}
+      .status{display:inline-block;background:#1d4ed8;color:#fff;border-radius:999px;padding:9px 22px;font-size:18px;font-weight:800;margin-bottom:16px}
+      .qnum{font-size:34px;font-weight:800}
+      .qdate{font-size:19px;color:#cbd5e1;margin-top:6px}
+      .grid{display:grid;grid-template-columns:1fr 1.08fr;gap:24px;margin-top:30px}
+      .box{border:1.5px solid #cbd5e1;border-radius:16px;background:#f8fafc;padding:24px 26px;min-height:168px}
+      .box.blue{background:#eff6ff;border-color:#bfdbfe}
+      .label{font-size:18px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+      .main{font-size:30px;font-weight:800;color:#0f172a;margin-bottom:10px}
+      .line{font-size:22px;color:#1e293b;margin-top:3px}
+      table{width:100%;border-collapse:collapse;margin-top:34px;font-size:22px}
+      th{background:#1d4ed8;color:#fff;text-align:left;padding:15px 18px;font-size:19px;text-transform:uppercase;letter-spacing:.6px}
+      th:first-child{border-top-left-radius:12px} th:last-child{border-top-right-radius:12px}
+      td{border-bottom:1px solid #e2e8f0;padding:15px 18px;vertical-align:top}
+      tbody tr:nth-child(even) td{background:#f8fafc}
+      .c-no{width:66px;font-weight:800;color:#1d4ed8}
+      .c-name{width:560px;white-space:pre-wrap;word-break:break-word}
+      .num{text-align:right;white-space:nowrap}
+      .strong{font-weight:800}
+      .summary-wrap{display:flex;align-items:flex-start;gap:28px;margin-top:28px}
+      .note{flex:1;border:1.5px solid #cbd5e1;background:#f8fafc;border-radius:16px;padding:22px 24px;white-space:pre-wrap;color:#1e293b;min-height:120px}
+      .totals{margin-left:auto;width:430px;border:1.5px solid #cbd5e1;border-radius:16px;padding:20px 24px;background:#fff}
+      .total-row{display:flex;justify-content:space-between;gap:20px;padding:8px 0;font-size:22px}
+      .total-row span:first-child{color:#475569}
+      .grand{border-top:3px solid #1d4ed8;margin-top:10px;padding-top:16px;color:#1d4ed8;font-size:30px;font-weight:900}
+      .delivery{margin-top:24px;background:#f59e0b;color:#fff;border-radius:14px;text-align:center;padding:16px 20px;font-size:24px;font-weight:800}
+      .qr-box{margin-top:28px;width:250px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:16px;padding:16px;text-align:center;color:#0f172a}
+      .qr-box img{width:170px;height:170px;display:block;margin:8px auto;background:#fff}
+      .qr-title{font-size:18px;font-weight:800;color:#475569}
+      .qr-id{font-size:17px;color:#1d4ed8;font-weight:800}
+      .qr-amt{font-size:22px;font-weight:900;margin-top:4px}
+      .foot{margin-top:42px;border-top:1.5px solid #cbd5e1;padding-top:18px;display:flex;justify-content:space-between;color:#64748b;font-size:18px}
+    </style>
+    <div class="pdf-head">
+      <div>
+        <div class="brand">${pdfText(settings.brand,'VISION FOLD DESIGN')}</div>
+        <div class="sub">Laser Engraving &amp; Print Specialist</div>
+        <div class="contact">${contact || 'Bangkok, Thailand | Line: @visionfold'}</div>
+        ${settings.address?`<div class="contact">${pdfEscapeHtml(settings.address)}</div>`:''}
+      </div>
+      <div class="quote-side">
+        <div class="status">${pdfEscapeHtml(pdfStatusLabel(data.status))}</div>
+        <div class="qnum">${pdfText(data.number,'QT-')}</div>
+        <div class="qdate">วันที่: ${pdfText(data.quoteDate,'-')}</div>
+        <div class="qdate">หมดอายุ: ${pdfText(data.expireDate,'-')}</div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="box">
+        <div class="label">เรียน / TO</div>
+        <div class="main">${pdfText(data.clientName)}</div>
+        ${data.clientContact?`<div class="line">ผู้ติดต่อ: ${pdfEscapeHtml(data.clientContact)}</div>`:''}
+        ${data.clientPhone?`<div class="line">โทร: ${pdfEscapeHtml(data.clientPhone)}</div>`:''}
+        ${data.clientEmail?`<div class="line">Email: ${pdfEscapeHtml(data.clientEmail)}</div>`:''}
+      </div>
+      <div class="box blue">
+        <div class="label">โปรเจกต์</div>
+        <div class="main">${pdfText(data.projectName)}</div>
+        <div class="line">ระยะเวลา: ${pdfText(data.leadTime,'-')}</div>
+        <div class="line">ชำระเงิน: ${pdfText(data.paymentTerms,'-')}</div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>No.</th><th>รายการ</th><th class="num">จำนวน</th><th class="num">ราคา/หน่วย</th><th class="num">รวม</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="summary-wrap">
+      <div style="flex:1">
+        ${data.notes?`<div class="note"><strong>หมายเหตุ</strong><br>${pdfEscapeHtml(data.notes)}</div>`:''}
+        ${data.deliveryDate?`<div class="delivery">กำหนดส่งงาน: ${pdfEscapeHtml(data.deliveryDate)}</div>`:''}
+        ${qrHtml}
+      </div>
+      <div class="totals">
+        <div class="total-row"><span>ยอดรวมก่อน VAT</span><strong>${pdfMoney(data.subtotal)}</strong></div>
+        ${data.discount>0?`<div class="total-row"><span>ส่วนลด</span><strong>-${pdfMoney(data.discount)}</strong></div>`:''}
+        ${data.useVat?`<div class="total-row"><span>VAT 7%</span><strong>${pdfMoney(data.vat)}</strong></div>`:''}
+        <div class="total-row grand"><span>ยอดรวมสุทธิ</span><span>${pdfMoney(data.total)}</span></div>
+      </div>
+    </div>
+    <div class="foot">
+      <span>${pdfText(settings.brand,'VISION FOLD DESIGN')} • Laser Engraving &amp; Print Specialist</span>
+      <span>${settings.line ? 'Line: '+pdfEscapeHtml(settings.line) : ''}</span>
+    </div>
+  </div>`;
+}
+
+async function renderImagePdfPage(markup){
+  const host=document.createElement('div');
+  host.style.cssText='position:fixed;left:-10000px;top:0;width:1240px;background:#fff;opacity:0;pointer-events:none;z-index:-1;';
+  host.innerHTML=markup;
+  document.body.appendChild(host);
+  let svgUrl='';
+  try{
+    if(document.fonts?.ready) await document.fonts.ready.catch(()=>{});
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    const page=host.querySelector('.pdf-page');
+    const width=Math.ceil(page.scrollWidth);
+    const height=Math.ceil(page.scrollHeight);
+    const serialized=new XMLSerializer().serializeToString(page);
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${serialized}</foreignObject></svg>`;
+    svgUrl=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
+    const img=new Image();
+    await new Promise((resolve,reject)=>{
+      img.onload=resolve;
+      img.onerror=()=>reject(new Error('ไม่สามารถแปลง HTML เป็นภาพได้'));
+      img.src=svgUrl;
+    });
+    const scale=2;
+    const canvas=document.createElement('canvas');
+    canvas.width=width*scale;
+    canvas.height=height*scale;
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    return {
+      dataUrl:canvas.toDataURL('image/jpeg',0.94),
+      widthPx:canvas.width,
+      heightPx:canvas.height
+    };
+  } finally {
+    if(svgUrl) URL.revokeObjectURL(svgUrl);
+    host.remove();
+  }
+}
+
+function addFullImageToPdf(doc, image){
+  const pageW=210, pageH=297;
+  const imgH=image.heightPx*pageW/image.widthPx;
+  const pages=Math.max(1,Math.ceil((imgH-0.5)/pageH));
+  for(let p=0;p<pages;p++){
+    if(p>0) doc.addPage();
+    doc.addImage(image.dataUrl,'JPEG',0,-p*pageH,pageW,imgH,undefined,'FAST');
+  }
+}
+
 async function generatePdf(mode='save') {
   if(actionBusy) return;
   const data=getFormData();
@@ -2973,162 +3179,27 @@ async function generatePdf(mode='save') {
     openPrintablePdfFallback(data);
     return;
   }
-  setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังสร้าง Preview...' : 'กำลัง Export...');
+  setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังสร้าง Image PDF...' : 'กำลัง Export Image PDF...');
   try {
     const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4'});
-    let pdfFontFamily = PDF_FONT_CFG.family;
-    try {
-      await registerPdfFonts(doc);
-    } catch(e) {
-      console.error(e);
-      pdfFontFamily = 'helvetica';
-      doc.setFont(pdfFontFamily,'normal');
-      showToast('ไม่พบฟอนต์ THSarabun — สร้าง PDF ต่อด้วยฟอนต์สำรองก่อน ถ้าต้องการภาษาไทยคมชัดให้อัปโหลด/วางไฟล์ฟอนต์', 5200);
-    }
-    const W=210,pH=297; let y=0;
-
-    doc.setFillColor(15,23,42);doc.rect(0,0,W,44,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(17);doc.setFont(pdfFontFamily,'bold');
-    doc.text(settings.brand||'VISION FOLD DESIGN',14,16);
-    doc.setFontSize(7);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(148,163,184);
-    doc.text('LASER ENGRAVING & PRINT SPECIALIST',14,22);
-    let cl='';
-    if(settings.phone)cl+=settings.phone+'  ';
-    if(settings.email)cl+=settings.email+'  ';
-    if(settings.line)cl+='Line: '+settings.line;
-    if(cl)doc.text(cl,14,28);
-    if(settings.address)doc.text(settings.address,14,34);
-    const scolor={draft:[120,120,120],sent:[26,111,189],approved:[42,122,42],rejected:[192,57,43],in_production:[212,67,14],delivered:[42,92,69]};
-    const sc=scolor[data.status]||[120,120,120];
-    doc.setFillColor(...sc);doc.roundedRect(W-50,8,38,12,3,3,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(pdfFontFamily,'bold');
-    doc.text(data.status.toUpperCase(),W-31,16,{align:'center'});
-    doc.setTextColor(255,255,255);doc.setFontSize(13);
-    doc.text(data.number,W-14,26,{align:'right'});
-    doc.setFontSize(7);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(148,163,184);
-    doc.text('วันที่: '+data.quoteDate,W-14,32,{align:'right'});
-    doc.text('หมดอายุ: '+data.expireDate,W-14,38,{align:'right'});
-    y=52;
-
-    doc.setFillColor(248,250,252);doc.roundedRect(12,y,86,38,2,2,'F');
-    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'bold');
-    doc.text('เรียน / TO',16,y+7);
-    doc.setTextColor(15,23,42);doc.setFontSize(10);doc.setFont(pdfFontFamily,'bold');
-    doc.text(data.clientName||'—',16,y+14);
-    doc.setFontSize(8);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(30,41,59);
-    if(data.clientContact)doc.text('ผู้ติดต่อ: '+data.clientContact,16,y+20);
-    if(data.clientPhone)doc.text('โทร: '+data.clientPhone,16,y+26);
-    if(data.clientEmail)doc.text('Email: '+data.clientEmail,16,y+32);
-
-    doc.setFillColor(239,246,255);doc.roundedRect(102,y,96,38,2,2,'F');
-    doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'bold');
-    doc.text('โปรเจกต์',106,y+7);
-    doc.setTextColor(15,23,42);doc.setFontSize(9);doc.setFont(pdfFontFamily,'bold');
-    doc.text(doc.splitTextToSize(data.projectName||'—',84),106,y+14);
-    doc.setFontSize(7.5);doc.setFont(pdfFontFamily,'normal');doc.setTextColor(30,41,59);
-    doc.text('ระยะเวลา: '+data.leadTime,106,y+28);
-    doc.text('ชำระเงิน: '+data.paymentTerms,106,y+35);
-    y+=46;
-
-    const drawItemsHeader = ()=>{
-      doc.setFillColor(29,78,216);doc.rect(12,y,W-24,9,'F');
-      doc.setTextColor(255,255,255);doc.setFontSize(7.5);doc.setFont(pdfFontFamily,'bold');
-      doc.text('No.',16,y+6);
-      doc.text('รายการ',28,y+6);
-      doc.text('จำนวน',118,y+6,{align:'right'});
-      doc.text('ราคา/หน่วย',150,y+6,{align:'right'});
-      doc.text('รวม (฿)',W-14,y+6,{align:'right'});
-      y+=9;
-    };
-    drawItemsHeader();
-
-    data.items.forEach((it,i)=>{
-      const nameLines=doc.splitTextToSize(it.name || '—',78);
-      const rowHeight=Math.max(8, nameLines.length*4.4 + 3);
-      if(y+rowHeight>pH-55){doc.addPage();y=20;drawItemsHeader();}
-      doc.setFillColor(i%2===0?255:241,i%2===0?255:245,i%2===0?255:249);
-      doc.rect(12,y,W-24,rowHeight,'F');
-      const midY = y + rowHeight/2 + 1.2;
-      doc.setTextColor(15,23,42);doc.setFontSize(8);
-      doc.setFont(pdfFontFamily,'bold');
-      doc.text(String(i+1),16,midY);
-      doc.setFont(pdfFontFamily,'normal');
-      doc.text(nameLines,28,y+5.2);
-      doc.text(it.qty.toLocaleString(),118,midY,{align:'right'});
-      doc.text('฿'+it.price.toLocaleString('en',{minimumFractionDigits:2}),150,midY,{align:'right'});
-      doc.text('฿'+(it.qty*it.price).toLocaleString('en',{minimumFractionDigits:2}),W-14,midY,{align:'right'});
-      y+=rowHeight;
-    });
-    y+=4;
-
-    const tX=128;
-    const tr=(lbl,val,bold,color)=>{
-      if(color)doc.setTextColor(...color);else doc.setTextColor(30,41,59);
-      doc.setFontSize(8.5);doc.setFont(pdfFontFamily,bold?'bold':'normal');
-      doc.text(lbl,tX,y);
-      doc.text('฿'+val.toLocaleString('en',{minimumFractionDigits:2}),W-14,y,{align:'right'});
-      y+=6;
-    };
-    tr('ยอดรวมก่อน VAT',data.subtotal);
-    if(data.useVat)tr('VAT 7%',data.vat);
-    if(data.discount>0)tr('ส่วนลด',-data.discount);
-    doc.setDrawColor(42,92,69);doc.setLineWidth(0.5);doc.line(tX,y,W-14,y);y+=4;
-    tr('ยอดรวมสุทธิ',data.total,true,[42,92,69]);
-
-    if(data.notes){
-      y+=5;
-      const nl=doc.splitTextToSize(data.notes,W-32);
-      const nh=nl.length*5+9;
-      if(y+nh>pH-20){doc.addPage();y=20;}
-      doc.setFillColor(248,250,252);doc.roundedRect(12,y,W-24,nh,2,2,'F');
-      doc.setTextColor(71,85,105);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'bold');
-      doc.text('หมายเหตุ',16,y+6);
-      doc.setTextColor(30,41,59);doc.setFontSize(7.5);doc.setFont(pdfFontFamily,'normal');
-      doc.text(nl,16,y+11);
-      y+=nh+4;
-    }
-
-    if(data.deliveryDate){
-      y+=2;
-      doc.setFillColor(212,67,14);doc.roundedRect(12,y,W-24,10,2,2,'F');
-      doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont(pdfFontFamily,'bold');
-      doc.text(' กำหนดส่งงาน: '+data.deliveryDate,W/2,y+7,{align:'center'});
-      y+=14;
-    }
-
-    if(settings.promptpay) {
-      try {
-        const ppPayload = genPromptPayPayload(settings.promptpay, data.total);
-        const qrY = pH - 52;
-        doc.setFillColor(239,246,255); doc.roundedRect(12, qrY, 52, 38, 2, 2, 'F');
-        doc.setTextColor(71,85,105); doc.setFontSize(6); doc.setFont(pdfFontFamily,'bold');
-        doc.text('ชำระเงินผ่าน PromptPay', 38, qrY+5, {align:'center'});
-        const qrPng = await qrPayloadToPngDataUrl(ppPayload, 240);
-        if(qrPng){ doc.addImage(qrPng,'PNG',14,qrY+7,28,28); }
-        else { doc.setFontSize(6); doc.setTextColor(185,28,28); doc.text('QR ERROR', 28, qrY+22, {align:'center'}); }
-        doc.setTextColor(29,78,216); doc.setFontSize(6.5); doc.setFont(pdfFontFamily,'bold');
-        doc.text(settings.promptpay, 38, qrY+30, {align:'center'});
-        doc.setFontSize(7); doc.setTextColor(15,23,42);
-        doc.text('฿'+data.total.toLocaleString('en',{minimumFractionDigits:2}), 38, qrY+35, {align:'center'});
-      } catch(e) {}
-    }
-
-    doc.setFillColor(15,23,42);doc.rect(0,pH-14,W,14,'F');
-    doc.setTextColor(148,163,184);doc.setFontSize(6.5);doc.setFont(pdfFontFamily,'normal');
-    doc.text((settings.brand||'VISION FOLD DESIGN')+'  •  Laser Engraving & Print Specialist  •  '+((settings.line&&'Line: '+settings.line)||''),W/2,pH-7,{align:'center'});
-    if(settings.web)doc.text(settings.web,W-14,pH-7,{align:'right'});
-
+    const doc=new jsPDF({unit:'mm',format:'a4',compress:true});
+    const markup=await buildImagePdfHtml(data);
+    const image=await renderImagePdfPage(markup);
+    addFullImageToPdf(doc,image);
     if(mode==='preview'){
       const blob=doc.output('blob');
       const url=URL.createObjectURL(blob);
-      window.open(url,'_blank');
+      const w=window.open(url,'_blank');
       setTimeout(()=>URL.revokeObjectURL(url),120000);
-      showToast('เปิด Preview PDF แล้ว');
+      showToast(w ? 'เปิด Preview PDF แบบภาพแล้ว' : 'Browser บล็อก popup — Export PDF ยังใช้ได้');
     }else{
       doc.save('QT_'+data.number+'_'+(data.clientName||'').replace(/\s/g,'_')+'.pdf');
-      showToast('Export PDF สำเร็จ');
+      showToast('Export PDF แบบภาพสำเร็จ');
     }
+  } catch(e) {
+    console.error(e);
+    openPrintablePdfFallback(data);
+    showToast('สร้าง Image PDF ไม่สำเร็จ — เปิด Print PDF สำรองให้แล้ว', 5200);
   } finally {
     setPrimaryActionBusy(false);
   }
