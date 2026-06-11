@@ -553,7 +553,7 @@ label,.card-title,.items-header span,.history-table th,.hist-table th{color:var(
     <button class="btn btn-outline" onclick="duplicateForm()">Duplicate</button>
     <button class="btn btn-info" onclick="sendToSheets()">ส่งไป Sheets</button>
     <button class="btn btn-info" onclick="fetchNextNumber()">ขอเลขจาก Sheets</button>
-    <button class="btn btn-outline btn-action-preview" onclick="previewPrint()">Preview Print / Test PDF</button>
+    <button class="btn btn-outline btn-action-preview" onclick="previewPrint()">Preview PDF</button>
     <button class="btn btn-primary btn-action-main btn-action-clear" onclick="clearForm()">Clear Form</button>
     <button class="btn btn-gold btn-action-main btn-action-export" onclick="exportPDF()">Export PDF</button>
     <button class="btn btn-primary btn-action-main btn-action-save" onclick="saveQuotation()">บันทึก</button>
@@ -2808,22 +2808,9 @@ function ensureChartJsLoaded(){
   ], hasChartJs, 12000);
 }
 
-function openPrintablePdfFallback(data){
-  const rows=(data.items||[]).map((it,i)=>`<tr><td>${i+1}</td><td>${pdfEscapeHtml(it.name||'—')}</td><td class="num">${Number(it.qty||0).toLocaleString()}</td><td class="num">฿${Number(it.price||0).toLocaleString('en',{minimumFractionDigits:2})}</td><td class="num">฿${Number((it.qty||0)*(it.price||0)).toLocaleString('en',{minimumFractionDigits:2})}</td></tr>`).join('');
-  const html=`<!doctype html><html lang="th"><head><meta charset="utf-8"><title>${pdfEscapeHtml(data.number||'Quotation')}</title><style>
-    @font-face{font-family:THSarabun;src:url('./THSarabun.ttf')}*{box-sizing:border-box}body{font-family:THSarabun,Arial,sans-serif;margin:0;color:#0f172a;background:#fff;font-size:16px}.page{width:210mm;min-height:297mm;margin:0 auto;padding:14mm}.head{background:#0f172a;color:#fff;padding:18px 22px;border-radius:10px;display:flex;justify-content:space-between}.brand{font-size:28px;font-weight:700}.muted{color:#64748b}.white-muted{color:#cbd5e1}.box{border:1px solid #cbd5e1;border-radius:10px;padding:14px;margin-top:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}table{width:100%;border-collapse:collapse;margin-top:14px}th{background:#1d4ed8;color:#fff;text-align:left;padding:8px}td{border-bottom:1px solid #e2e8f0;padding:8px}.num{text-align:right}.totals{margin-left:auto;width:75mm;margin-top:10px}.totals div{display:flex;justify-content:space-between;padding:4px 0}.grand{font-size:22px;font-weight:700;color:#1d4ed8;border-top:2px solid #1d4ed8;margin-top:6px;padding-top:8px}.note{white-space:pre-wrap}@media print{.no-print{display:none}.page{margin:0;box-shadow:none}.box{break-inside:avoid}}</style></head><body><div class="page">
-    <div class="head"><div><div class="brand">${pdfEscapeHtml(settings.brand||'VISION FOLD DESIGN')}</div><div class="white-muted">Laser Engraving & Print Specialist</div></div><div style="text-align:right"><div>${pdfEscapeHtml(data.number||'')}</div><div class="white-muted">วันที่ ${pdfEscapeHtml(data.quoteDate||'')}</div><div class="white-muted">หมดอายุ ${pdfEscapeHtml(data.expireDate||'')}</div></div></div>
-    <div class="grid"><div class="box"><strong>เรียน / TO</strong><br>${pdfEscapeHtml(data.clientName||'—')}<br>${pdfEscapeHtml(data.clientContact||'')}<br>${pdfEscapeHtml(data.clientPhone||'')}<br>${pdfEscapeHtml(data.clientEmail||'')}</div><div class="box"><strong>โปรเจกต์</strong><br>${pdfEscapeHtml(data.projectName||'—')}<br>ระยะเวลา: ${pdfEscapeHtml(data.leadTime||'')}<br>ชำระเงิน: ${pdfEscapeHtml(data.paymentTerms||'')}</div></div>
-    <table><thead><tr><th>No.</th><th>รายการ</th><th class="num">จำนวน</th><th class="num">ราคา/หน่วย</th><th class="num">รวม</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="totals"><div><span>ยอดรวมก่อน VAT</span><strong>฿${Number(data.subtotal||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>${data.useVat?`<div><span>VAT 7%</span><strong>฿${Number(data.vat||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>`:''}${data.discount>0?`<div><span>ส่วนลด</span><strong>-฿${Number(data.discount||0).toLocaleString('en',{minimumFractionDigits:2})}</strong></div>`:''}<div class="grand"><span>ยอดรวมสุทธิ</span><span>฿${Number(data.total||0).toLocaleString('en',{minimumFractionDigits:2})}</span></div></div>
-    ${data.notes?`<div class="box note"><strong>หมายเหตุ</strong><br>${pdfEscapeHtml(data.notes)}</div>`:''}
-    <p class="muted no-print">ระบบเปิดหน้า Print PDF สำรองให้แล้ว ให้เลือก Destination: Save as PDF</p>
-    <script>window.onload=function(){setTimeout(function(){window.print()},350)}<\/script>
-  </div></body></html>`;
-  const w=window.open('', '_blank');
-  if(!w){ showToast('Browser บล็อก popup — กด Preview Print / Test PDF แล้วอนุญาต popup', 5200); return; }
-  w.document.open(); w.document.write(html); w.document.close();
-  showToast('ไม่พบ jsPDF — เปิด Print PDF สำรองแล้ว เลือก Save as PDF', 5200);
+function showPdfExportError(err){
+  console.error(err);
+  showToast('สร้างไฟล์ PDF ไม่สำเร็จ กรุณาลอง Export อีกครั้ง', 5200);
 }
 
 // ── PDF EXPORT ─────────────────────────────────────────
@@ -3147,7 +3134,7 @@ async function renderImagePdfPage(markup){
     ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
     return {
-      dataUrl:canvas.toDataURL('image/jpeg',0.94),
+      canvas,
       widthPx:canvas.width,
       heightPx:canvas.height
     };
@@ -3157,14 +3144,116 @@ async function renderImagePdfPage(markup){
   }
 }
 
-function addFullImageToPdf(doc, image){
-  const pageW=210, pageH=297;
-  const imgH=image.heightPx*pageW/image.widthPx;
-  const pages=Math.max(1,Math.ceil((imgH-0.5)/pageH));
-  for(let p=0;p<pages;p++){
-    if(p>0) doc.addPage();
-    doc.addImage(image.dataUrl,'JPEG',0,-p*pageH,pageW,imgH,undefined,'FAST');
+function pdfDataUrlToBytes(dataUrl){
+  const b64=dataUrl.split(',')[1]||'';
+  const bin=atob(b64);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return bytes;
+}
+
+function splitCanvasToA4Jpegs(canvas){
+  const pageH=Math.floor(canvas.width*297/210);
+  const pages=[];
+  for(let y=0;y<canvas.height-2;y+=pageH){
+    const sliceH=Math.min(pageH,canvas.height-y);
+    const pageCanvas=document.createElement('canvas');
+    pageCanvas.width=canvas.width;
+    pageCanvas.height=pageH;
+    const ctx=pageCanvas.getContext('2d');
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,pageCanvas.width,pageCanvas.height);
+    ctx.drawImage(canvas,0,y,canvas.width,sliceH,0,0,canvas.width,sliceH);
+    pages.push({
+      bytes:pdfDataUrlToBytes(pageCanvas.toDataURL('image/jpeg',0.94)),
+      width:pageCanvas.width,
+      height:pageCanvas.height
+    });
   }
+  return pages;
+}
+
+function pdfAscii(str){
+  return new TextEncoder().encode(str);
+}
+
+function buildPdfBlobFromJpegs(images){
+  const pageW=595.28, pageH=841.89;
+  const objects=[];
+  const pageRefs=[];
+  objects[1]=[pdfAscii('<< /Type /Catalog /Pages 2 0 R >>')];
+  objects[2]=null;
+
+  images.forEach((img,i)=>{
+    const pageObj=objects.length;
+    const contentObj=pageObj+1;
+    const imageObj=pageObj+2;
+    const name='Im'+(i+1);
+    const ops=`q\n${pageW.toFixed(2)} 0 0 ${pageH.toFixed(2)} 0 0 cm\n/${name} Do\nQ\n`;
+    const opsBytes=pdfAscii(ops);
+    objects[pageObj]=[pdfAscii(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW.toFixed(2)} ${pageH.toFixed(2)}] /Resources << /XObject << /${name} ${imageObj} 0 R >> >> /Contents ${contentObj} 0 R >>`)];
+    objects[contentObj]=[
+      pdfAscii(`<< /Length ${opsBytes.length} >>\nstream\n`),
+      opsBytes,
+      pdfAscii('\nendstream')
+    ];
+    objects[imageObj]=[
+      pdfAscii(`<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.bytes.length} >>\nstream\n`),
+      img.bytes,
+      pdfAscii('\nendstream')
+    ];
+    pageRefs.push(pageObj+' 0 R');
+  });
+
+  objects[2]=[pdfAscii(`<< /Type /Pages /Kids [${pageRefs.join(' ')}] /Count ${pageRefs.length} >>`)];
+
+  const parts=[];
+  const offsets=[0];
+  let offset=0;
+  const push=part=>{parts.push(part);offset+=part.length;};
+  const pushText=str=>push(pdfAscii(str));
+
+  pushText('%PDF-1.4\n%\xFF\xFF\xFF\xFF\n');
+  for(let i=1;i<objects.length;i++){
+    offsets[i]=offset;
+    pushText(`${i} 0 obj\n`);
+    objects[i].forEach(push);
+    pushText('\nendobj\n');
+  }
+  const xrefOffset=offset;
+  pushText(`xref\n0 ${objects.length}\n0000000000 65535 f \n`);
+  for(let i=1;i<objects.length;i++){
+    pushText(String(offsets[i]).padStart(10,'0')+' 00000 n \n');
+  }
+  pushText(`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
+
+  return new Blob(parts,{type:'application/pdf'});
+}
+
+function downloadPdfBlob(blob, filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),120000);
+}
+
+function openPdfBlob(blob){
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+  setTimeout(()=>URL.revokeObjectURL(url),120000);
+  return w;
+}
+
+async function createReadyPdfBlob(data){
+  const markup=await buildImagePdfHtml(data);
+  const image=await renderImagePdfPage(markup);
+  const pages=splitCanvasToA4Jpegs(image.canvas);
+  if(!pages.length) throw new Error('PDF page image is empty');
+  return buildPdfBlobFromJpegs(pages);
 }
 
 async function generatePdf(mode='save') {
@@ -3172,34 +3261,19 @@ async function generatePdf(mode='save') {
   const data=getFormData();
   const errors=validateQuotationData(data);
   if(errors.length){showToast('ยังสร้าง PDF ไม่ได้\n• '+errors.slice(0,5).join('\n• '), 5200);return;}
-  setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังโหลด PDF...' : 'กำลังโหลด PDF...');
-  const jsPdfReady = await ensureJsPDFLoaded();
-  if(!jsPdfReady){
-    setPrimaryActionBusy(false);
-    openPrintablePdfFallback(data);
-    return;
-  }
-  setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังสร้าง Image PDF...' : 'กำลัง Export Image PDF...');
+  setPrimaryActionBusy(true, mode==='preview' ? '.btn-action-preview' : '.btn-action-export', mode==='preview' ? 'กำลังสร้าง Preview PDF...' : 'กำลัง Export PDF...');
   try {
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4',compress:true});
-    const markup=await buildImagePdfHtml(data);
-    const image=await renderImagePdfPage(markup);
-    addFullImageToPdf(doc,image);
+    const blob=await createReadyPdfBlob(data);
+    const filename='QT_'+data.number+'_'+(data.clientName||'').replace(/\s/g,'_')+'.pdf';
     if(mode==='preview'){
-      const blob=doc.output('blob');
-      const url=URL.createObjectURL(blob);
-      const w=window.open(url,'_blank');
-      setTimeout(()=>URL.revokeObjectURL(url),120000);
-      showToast(w ? 'เปิด Preview PDF แบบภาพแล้ว' : 'Browser บล็อก popup — Export PDF ยังใช้ได้');
+      const w=openPdfBlob(blob);
+      showToast(w ? 'เปิด Preview PDF แล้ว' : 'Browser บล็อก popup — กด Export PDF เพื่อดาวน์โหลดไฟล์');
     }else{
-      doc.save('QT_'+data.number+'_'+(data.clientName||'').replace(/\s/g,'_')+'.pdf');
-      showToast('Export PDF แบบภาพสำเร็จ');
+      downloadPdfBlob(blob,filename);
+      showToast('Export PDF สำเร็จ');
     }
   } catch(e) {
-    console.error(e);
-    openPrintablePdfFallback(data);
-    showToast('สร้าง Image PDF ไม่สำเร็จ — เปิด Print PDF สำรองให้แล้ว', 5200);
+    showPdfExportError(e);
   } finally {
     setPrimaryActionBusy(false);
   }
